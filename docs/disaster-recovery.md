@@ -18,9 +18,9 @@ C'est la règle d'or des sauvegardes, utilisée par les entreprises et les gouve
 | **2** supports | Deux supports différents | NVMe (interne) + SSD (externe) |
 | **1** externe | Une copie hors site | Disque dur physique à domicile |
 
-**Pourquoi 3 copies ?**
-- Si le serveur tombe en panne → copy 1 est perdue, copy 2 et 3 restent
-- Si le disque dur casse → copy 1 et 2 sont perdues, copy 3 reste
+**Pourquoi 3 copies ?**  
+- Si le serveur tombe en panne → copy 1 est perdue, copy 2 et 3 restent  
+- Si le disque dur casse → copy 1 et 2 sont perdues, copy 3 reste  
 - Si un incendie détruit tout → copy 3 (externe) est en sécurité
 
 ### Ce qui est sauvegardé
