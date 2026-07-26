@@ -2,7 +2,7 @@
 
 ## Vue d'ensemble
 
-Le Mounik Personal Cloud Platform héberge **17 services** organisés en 4 catégories. Chaque service a un rôle précis et remplace un service cloud externe.
+Le Mounik Personal Cloud Platform héberge **22 services** organisés en 4 catégories. Chaque service a un rôle précis et remplace un service cloud externe.
 
 ---
 
@@ -100,6 +100,36 @@ Ces services remplacent les applications que tu utilises tous les jours.
 
 ---
 
+### Home Assistant — Domotique
+
+**Ce que c'est :** Un système de domotique qui connecte tous tes appareils intelligents (alternative à Google Home, HomeKit).
+
+**Pourquoi ?**  
+- Contrôler la lumière, le chauffage, les prises connectées  
+- Automatisations avancées (ex: allumer les lumières au coucher du soleil)  
+- Tous tes appareils au même endroit  
+- Fonctionne 100% en local
+
+**Sous-domaine :** `home-assistant.mounik.ovh`  
+**Technologie :** Python, Docker, port 8123
+
+---
+
+### Plex — Média serveur
+
+**Ce que c'est :** Un serveur multimédia qui organise et diffuse tes films, séries et musiques (alternative à Netflix, Spotify).
+
+**Pourquoi ?**  
+- Streaming de ta médiathèque sur tous tes appareils  
+- Organisation automatique des métadonnées  
+- Accès à distance depuis n'importe où  
+- Partage avec la famille
+
+**Sous-domaine :** `plex.mounik.ovh`  
+**Technologie :** C++, Docker, port 32400
+
+---
+
 ## Développement
 
 Ces services sont destinés au développement logiciel et au DevOps.
@@ -153,15 +183,15 @@ Ces services sont destinés au développement logiciel et au DevOps.
 
 Ces services permettent d'utiliser l'IA de manière sécurisée.
 
-### Ollama — Proxy API IA
+### Ollama — Runner de modèles locaux
 
-**Ce que c'est :** Un proxy qui centralise les appels aux API d'IA (OpenAI, Anthropic, Mistral).
+**Ce que c'est :** Un outil qui fait tourner des modèles d'IA directement sur ton serveur (Llama, Mistral, etc.).
 
 **Pourquoi ?**  
-- Une seule interface pour plusieurs fournisseurs d'IA  
-- Gestion des clés API sécurisée  
-- Cache des réponses pour réduire les coûts  
-- Monitoring des appels
+- Tes données restent chez toi (pas d'envoi vers OpenAI/Anthropic)  
+- Fonctionne même sans internet  
+- Pas de coût par token  
+- Plusieurs modèles disponibles (Llama, Mistral, Phi, etc.)
 
 **Sous-domaine :** `ollama.mounik.ovh`  
 **Technologie :** Go, Docker, port 11434
@@ -327,19 +357,23 @@ Ces services surveillent et protègent l'infrastructure.
 | | Twenty CRM | `twenty.mounik.ovh` | Salesforce, HubSpot |
 | | Actual Budget | `actual.mounik.ovh` | YNAB |
 | | Nextcloud | `nextcloud.mounik.ovh` | Google Drive, iCloud |
+| | Home Assistant | `home-assistant.mounik.ovh` | Google Home, HomeKit |
+| | Plex | `plex.mounik.ovh` | Netflix, Spotify |
 | **Développement** | GitLab CE | `gitlab.mounik.ovh` | GitHub, GitLab.com |
 | | ArgoCD | `argocd.mounik.ovh` | DeployBot |
 | | Harbor | `harbor.mounik.ovh` | Docker Hub |
-| **Intelligence artificielle** | Ollama | `ollama.mounik.ovh` | API multiples |
+| **Intelligence artificielle** | Ollama | `ollama.mounik.ovh` | OpenAI API (local) |
 | | OpenWebUI | `openwebui.mounik.ovh` | ChatGPT |
-| | LangGraph | — | — |
+| | LangGraph | `langgraph.mounik.ovh` | AutoGPT |
 | | n8n | `n8n.mounik.ovh` | Zapier, Make |
-| | Qdrant | — | Pinecone, Weaviate |
+| | Qdrant | `qdrant.mounik.ovh` | Pinecone, Weaviate |
+| | JobSync | `jobsync.mounik.ovh` | — |
 | **Sécurité & Monitoring** | Traefik | `traefik.mounik.ovh` | Nginx, HAProxy |
 | | TinyAuth | `tinyauth.mounik.ovh` | Authelia |
+| | Authentik | `authentik.mounik.ovh` | Keycloak |
 | | CrowdSec | — | Fail2Ban |
 | | Prometheus | — | — |
-| | Grafana | `grafana.mounik.ovh` | Datadog |
+| | Grafana | `grafana.mounik.ovh` | Datadog (monitoring complet) |
 | | Loki | — | ELK Stack |
 | | Alertmanager | — | PagerDuty |
 | | Wazuh | `wazuh.mounik.ovh` | Splunk |

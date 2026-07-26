@@ -22,7 +22,7 @@
   notify: restart jobsync
 
 - name: Démarrer JobSync
-  community.docker.docker_compose:
+  community.docker.docker_compose_v2:
     project_src: /opt/jobsync
     state: present
   register: jobsync_compose

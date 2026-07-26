@@ -30,18 +30,21 @@
     src: docker-compose.yml.j2
     dest: /opt/authentik/docker-compose.yml
     mode: '0644'
+  notify: restart authentik
 
 - name: Déployer la configuration Authentik
   template:
     src: authentik-config.yml.j2
     dest: /opt/authentik/data/authentik-config.yml
     mode: '0644'
+  notify: restart authentik
 
 - name: Déployer le fichier .env
   template:
     src: env.j2
     dest: /opt/authentik/.env
     mode: '0600'
+  notify: restart authentik
 
 - name: Créer le réseau Docker frontend
   command: docker network create frontend

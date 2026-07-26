@@ -1,7 +1,7 @@
 ---
 # Defaults - Authentik
 
-authentik_domain: "auth.mounik.ovh"
+authentik_domain: "authentik.mounik.ovh"
 authentik_port: 9000
 authentik_log_level: "info"
 

@@ -22,7 +22,7 @@
   notify: restart twenty-crm
 
 - name: Démarrer Twenty CRM
-  community.docker.docker_compose:
+  community.docker.docker_compose_v2:
     project_src: /opt/twenty-crm
     state: present
   register: twenty_compose

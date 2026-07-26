@@ -22,7 +22,7 @@ ansible/inventory-generated.yml
 *.pem
 *.key
 
-# Screts
+# Secrets
 .env
 .env.*
 

@@ -33,6 +33,7 @@
     owner: admin
     group: admin
     mode: "0644"
+  notify: restart monitoring
 
 - name: Déployer Prometheus config
   ansible.builtin.template:
@@ -41,6 +42,7 @@
     owner: admin
     group: admin
     mode: "0644"
+  notify: restart monitoring
 
 - name: Déployer Prometheus alert rules
   ansible.builtin.template:
@@ -49,6 +51,7 @@
     owner: admin
     group: admin
     mode: "0644"
+  notify: restart monitoring
 
 - name: Déployer Loki config
   ansible.builtin.template:
@@ -57,6 +60,7 @@
     owner: admin
     group: admin
     mode: "0644"
+  notify: restart monitoring
 
 - name: Déployer Promtail config
   ansible.builtin.template:
@@ -65,6 +69,7 @@
     owner: admin
     group: admin
     mode: "0644"
+  notify: restart monitoring
 
 - name: Déployer Alertmanager config
   ansible.builtin.template:
@@ -73,6 +78,7 @@
     owner: admin
     group: admin
     mode: "0644"
+  notify: restart monitoring
 
 - name: Déployer Grafana datasources
   ansible.builtin.template:
@@ -81,6 +87,7 @@
     owner: admin
     group: admin
     mode: "0644"
+  notify: restart monitoring
 
 - name: Déployer Grafana dashboard provisioning
   ansible.builtin.template:
@@ -89,6 +96,7 @@
     owner: admin
     group: admin
     mode: "0644"
+  notify: restart monitoring
 
 - name: Déployer Grafana dashboard system
   ansible.builtin.template:
@@ -97,6 +105,7 @@
     owner: admin
     group: admin
     mode: "0644"
+  notify: restart monitoring
 
 - name: Lancer la stack monitoring
   community.docker.docker_compose_v2:

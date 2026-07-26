@@ -16,7 +16,7 @@ module "k3s_node02" {
   vm_name        = "k3s-node02"
   vm_id          = 300
   node_name      = var.pve03_node
-  template_name  = var.template_name
+
   cpu_cores      = 4
   memory_mb      = 24576  # 24 Go pour K8s
   disk_gb        = 100
@@ -24,8 +24,8 @@ module "k3s_node02" {
   gateway        = var.gateway
   ssh_public_key = var.ssh_public_key
   datastore_id   = var.datastore_id
-  tags           = "k8s;wazuh;n8n"
-  description    = "k3s Node 02 - Wazuh, n8n, monitoring"
+  tags           = "k8s;wazuh"
+  description    = "k3s Node 02 - Wazuh, monitoring"
 
   disks = [
     { size = "100", datastore_id = var.datastore_id }
@@ -41,7 +41,7 @@ module "ollama" {
   vm_name        = "ollama"
   vm_id          = 310
   node_name      = var.pve03_node
-  template_name  = var.template_name
+
   cpu_cores      = 4
   memory_mb      = 8192
   disk_gb        = 50
@@ -50,7 +50,7 @@ module "ollama" {
   ssh_public_key = var.ssh_public_key
   datastore_id   = var.datastore_id
   tags           = "ai;llm"
-  description    = "Ollama - Modèles IA (cloud API)"
+  description    = "Ollama - Runner de modèles IA locaux"
 }
 
 module "openwebui" {
@@ -59,7 +59,6 @@ module "openwebui" {
   vm_name        = "open-webui"
   vm_id          = 311
   node_name      = var.pve03_node
-  template_name  = var.template_name
   cpu_cores      = 2
   memory_mb      = 4096
   disk_gb        = 30
@@ -77,7 +76,6 @@ module "qdrant" {
   vm_name        = "qdrant"
   vm_id          = 312
   node_name      = var.pve03_node
-  template_name  = var.template_name
   cpu_cores      = 2
   memory_mb      = 4096
   disk_gb        = 30
@@ -95,7 +93,6 @@ module "langgraph" {
   vm_name        = "langgraph"
   vm_id          = 313
   node_name      = var.pve03_node
-  template_name  = var.template_name
   cpu_cores      = 2
   memory_mb      = 4096
   disk_gb        = 20
@@ -113,7 +110,6 @@ module "n8n" {
   vm_name        = "n8n"
   vm_id          = 314
   node_name      = var.pve03_node
-  template_name  = var.template_name
   cpu_cores      = 2
   memory_mb      = 2048
   disk_gb        = 20
@@ -133,7 +129,6 @@ module "jobsync" {
   vm_name        = "jobsync"
   vm_id          = 315
   node_name      = var.pve03_node
-  template_name  = var.template_name
   cpu_cores      = 2
   memory_mb      = 2048
   disk_gb        = 20

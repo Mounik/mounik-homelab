@@ -49,10 +49,10 @@ Les VLANs créent des **réseaux virtuels séparés**. Chaque VLAN a son propre 
 
 | VLAN | ID  | Sous-réseau        | Usage | Analogie |
 |------|-----|--------------------|-------|----------|
-| Mgmt | 10  | 192.168.10.0/24   | SSH, API Proxmox | La clé du serveur |
-| Infra| 20  | 192.168.20.0/24   | Traefik, monitoring | Le local technique |
-| App  | 30  | 192.168.30.0/24   | Services personnels | Les bureaux |
-| IA   | 40  | 192.168.40.0/24   | Ollama, LangGraph, n8n | Le labo R&D |
+| Mgmt | 10  | 192.168.10.0/24   | SSH, API Proxmox | Le tableau de bord |
+| Infra| 20  | 192.168.20.0/24   | Traefik, monitoring | Le garage (outils essentiels) |
+| App  | 30  | 192.168.30.0/24   | Services personnels | Le salon (vie quotidienne) |
+| IA   | 40  | 192.168.40.0/24   | Ollama, LangGraph, n8n | Le bureau (travail) |
 
 ### Règles d'or
 
@@ -81,7 +81,9 @@ Les VLANs créent des **réseaux virtuels séparés**. Chaque VLAN a son propre 
 |---------------|------------------|------|-------|-------------|
 | traefik       | 192.168.20.100   | 20   | pve01 | Reverse proxy |
 | monitoring    | 192.168.20.101   | 20   | pve01 | Prometheus + Grafana |
+| authentik     | 192.168.20.102   | 20   | pve01 | SSO & IAM |
 | vaultwarden   | 192.168.20.103   | 20   | pve01 | Mots de passe |
+| cloudflare-tunnel | 192.168.20.104 | 20 | pve01 | Tunnel externe |
 | k3s-node01    | 192.168.20.200   | 20   | pve02 | Cluster Kubernetes |
 | k3s-node02    | 192.168.20.210   | 20   | pve03 | Cluster Kubernetes |
 | paperless     | 192.168.30.100   | 30   | pve02 | Documents |
@@ -147,22 +149,27 @@ Quand tu tapes `gitlab.mounik.ovh` dans ton navigateur :
 | Sous-domaine               | IP destination      | VLAN | Port | Service |
 |----------------------------|---------------------|------|------|---------|
 | `tinyauth.mounik.ovh`      | 192.168.20.100      | 20   | 443  | Authentification |
+| `traefik.mounik.ovh`       | 192.168.20.100      | 20   | 443  | Dashboard proxy |
+| `grafana.mounik.ovh`       | 192.168.20.101      | 20   | 443  | Monitoring |
+| `authentik.mounik.ovh`     | 192.168.20.102      | 20   | 443  | SSO & IAM |
 | `vaultwarden.mounik.ovh`   | 192.168.20.103      | 20   | 443  | Mots de passe |
+| `gitlab.mounik.ovh`        | 192.168.20.200      | 20   | 443  | Code |
+| `argocd.mounik.ovh`        | 192.168.20.200      | 20   | 443  | Déploiement |
+| `harbor.mounik.ovh`        | 192.168.20.200      | 20   | 443  | Registry |
+| `wazuh.mounik.ovh`         | 192.168.20.210      | 20   | 443  | Sécurité |
 | `paperless.mounik.ovh`     | 192.168.30.100      | 30   | 443  | Documents |
 | `immich.mounik.ovh`        | 192.168.30.101      | 30   | 443  | Photos |
 | `nextcloud.mounik.ovh`     | 192.168.30.102      | 30   | 443  | Cloud |
 | `twenty.mounik.ovh`        | 192.168.30.103      | 30   | 443  | Contacts |
 | `actual.mounik.ovh`        | 192.168.30.104      | 30   | 443  | Finance |
-| `grafana.mounik.ovh`       | 192.168.20.101      | 20   | 443  | Monitoring |
-| `traefik.mounik.ovh`       | 192.168.20.100      | 20   | 443  | Dashboard proxy |
-| `gitlab.mounik.ovh`        | 192.168.20.200      | 20   | 443  | Code |
-| `argocd.mounik.ovh`        | 192.168.20.200      | 20   | 443  | Déploiement |
-| `harbor.mounik.ovh`        | 192.168.20.200      | 20   | 443  | Registry |
-| `jobsync.mounik.ovh`       | 192.168.40.105      | 40   | 443  | Candidatures |
-| `wazuh.mounik.ovh`         | 192.168.20.210      | 20   | 443  | Sécurité |
-| `ollama.mounik.ovh`        | 192.168.40.100      | 40   | 443  | API IA |
+| `home-assistant.mounik.ovh`| 192.168.30.105      | 30   | 443  | Domotique |
+| `plex.mounik.ovh`          | 192.168.30.106      | 30   | 443  | Médias |
+| `ollama.mounik.ovh`        | 192.168.40.100      | 40   | 443  | IA locale |
 | `openwebui.mounik.ovh`     | 192.168.40.101      | 40   | 443  | Interface IA |
+| `qdrant.mounik.ovh`        | 192.168.40.102      | 40   | 443  | Base vectorielle |
+| `langgraph.mounik.ovh`     | 192.168.40.103      | 40   | 443  | Agents IA |
 | `n8n.mounik.ovh`           | 192.168.40.104      | 40   | 443  | Automatisation |
+| `jobsync.mounik.ovh`       | 192.168.40.105      | 40   | 443  | Candidatures |
 
 ---
 

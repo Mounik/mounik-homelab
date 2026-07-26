@@ -2,6 +2,13 @@
 
 ## A
 
+### Actual Budget
+**En simple :** Un gestionnaire de budget personnel open source (alternative à YNAB).  
+**Analogie :** C'est comme un carnet de chèques intelligent qui catégorise automatiquement tes dépenses.  
+**Dans ce projet :** Actual Budget gère les finances personnelles.
+
+---
+
 ### API (Application Programming Interface)
 **En simple :** C'est un "menu" qui permet à deux logiciels de communiquer entre eux.  
 **Analogie :** C'est comme un restaurant : tu n'entre pas dans la cuisine, tu choisis via le menu. L'API est le menu du logiciel.  
@@ -20,6 +27,13 @@
 **En simple :** Un outil qui déploie automatiquement tes applications quand tu modifies le code.  
 **Analogie :** C'est comme un jardinier automatique qui arrose les plantes quand il détecte que la terre est sèche.  
 **Dans ce projet :** ArgoCD surveille GitLab et déploie les applications sur Kubernetes.
+
+---
+
+### Authentik
+**En simple :** Un serveur d'authentification SSO (Single Sign-On) open source (alternative à Keycloak).  
+**Analogie :** C'est comme un portier qui vérifie ton identité une seule fois et te donne accès à tous les services.  
+**Dans ce projet :** Authentik est le SSO enterprise qui remplace TinyAuth (Phase 2).
 
 ---
 
@@ -145,6 +159,20 @@
 
 ---
 
+### Harbor
+**En simple :** Un registry Docker privé pour stocker tes images (alternative à Docker Hub).  
+**Analogie :** C'est comme un entrepôt sécurisé pour tes applications conteneurisées.  
+**Dans ce projet :** Harbor stocke les images Docker du cluster Kubernetes.
+
+---
+
+### Home Assistant
+**En simple :** Un système de domotique qui connecte tous tes appareils intelligents (alternative à Google Home).  
+**Analogie :** C'est comme un cerveau central qui coordonne tous les appareils de ta maison.  
+**Dans ce projet :** Home Assistant pilote la lumière, le chauffage, et les automatisations maison.
+
+---
+
 ## I
 
 ### IaC (Infrastructure as Code)
@@ -161,6 +189,20 @@
 
 ---
 
+### Immich
+**En simple :** Un album photo auto-hébergé (alternative à Google Photos).  
+**Analogie :** C'est comme un album photo numérique qui reconnaît les visages et les lieux automatiquement.  
+**Dans ce projet :** Immich gère les photos personnelles avec reconnaissance faciale.
+
+---
+
+### JobSync
+**En simple :** Un tracker de candidatures d'emploi open source qui centralise toutes tes candidatures en un seul endroit.
+**Analogie :** C'est comme un tableur Excel intelligent qui suit l'avancement de tes candidatures et t'alerte sur les délais.
+**Dans ce projet :** JobSync gère le suivi des candidatures d'emploi avec automatisation via n8n.
+
+---
+
 ## K
 
 ### Kubernetes (K8s)
@@ -170,7 +212,21 @@
 
 ---
 
+### k3s
+**En simple :** Une distribution légère de Kubernetes, conçue pour les edge computing et les petits clusters.  
+**Analogie :** C'est comme Kubernetes en version compact : même fonctionnalités, moins de ressources.  
+**Dans ce projet :** k3s fait tourner le cluster Kubernetes sur les nœuds pve02 et pve03.
+
+---
+
 ## L
+
+### LangGraph
+**En simple :** Un framework pour créer des agents IA autonomes qui peuvent utiliser des outils.  
+**Analogie :** C'est comme un assistant intelligent qui peut chercher des infos, envoyer des emails, et prendre des décisions.  
+**Dans ce projet :** LangGraph crée des agents IA qui interagissent avec les services.
+
+---
 
 ### LDAP (Lightweight Directory Access Protocol)
 **En simple :** Un protocole pour gérer les comptes utilisateurs. C'est comme un annuaire d'entreprise.  
@@ -225,12 +281,40 @@
 
 ---
 
+### Nextcloud
+**En simple :** Un cloud personnel (alternative à Google Drive, iCloud).  
+**Analogie :** C'est comme un disque dur dans le cloud, mais hébergé chez toi.  
+**Dans ce projet :** Nextcloud stocke les fichiers, calendriers, et contacts.
+
+---
+
+### n8n
+**En simple :** Un outil d'automatisation de workflows (alternative à Zapier, Make).  
+**Analogie :** C'est comme un robot qui connecte tes applications entre elles.  
+**Dans ce projet :** n8n automatise les tâches répétitives entre les services.
+
+---
+
 ## O
 
 ### OAuth2/OIDC
 **En simple :** Des protocoles pour s'authentifier via un service tiers (comme "Se connecter avec Google").  
 **Analogie :** C'est comme utiliser ta carte d'identité pour entrer dans un bâtiment : tu ne crées pas un nouveau compte, tu utilises celui que tu as déjà.  
 **Dans ce projet :** TinyAuth supporte l'OAuth2 (GitHub).
+
+---
+
+### Ollama
+**En simple :** Un outil qui fait tourner des modèles d'IA directement sur ton serveur (Llama, Mistral, etc.).  
+**Analogie :** C'est comme un traducteur personnel qui parle plusieurs langues, sans besoin d'internet.  
+**Dans ce projet :** Ollama fait tourner les modèles d'IA locaux pour le chat et le RAG.
+
+---
+
+### OpenWebUI
+**En simple :** Une interface web pour discuter avec l'IA (comme ChatGPT, mais en local).  
+**Analogie :** C'est comme une interface de messagerie, mais pour parler à ton IA locale.  
+**Dans ce projet :** OpenWebUI est l'interface de chat pour interagir avec Ollama.
 
 ---
 
@@ -257,6 +341,20 @@
 
 ---
 
+### Paperless-ngx
+**En simple :** Un scanner et organisateur de documents (alternative à un scanner papier).  
+**Analogie :** C'est comme un assistant qui classe tous tes papiers automatiquement.  
+**Dans ce projet :** Paperless-ngx numérise et organise les documents administratifs.
+
+---
+
+### Plex
+**En simple :** Un serveur multimédia qui organise et diffuse tes films, séries et musiques.  
+**Analogie :** C'est comme Netflix, mais avec ta propre médiathèque.  
+**Dans ce projet :** Plex streaming la médiathèque personnelle sur tous les appareils.
+
+---
+
 ### Prometheus
 **En simple :** Un outil qui collecte les métriques (CPU, RAM, disque, etc.) de tes serveurs et containers.  
 **Analogie :** C'est comme un compteur electricité qui mesure la consommation de chaque pièce.  
@@ -275,6 +373,13 @@
 **En simple :** Un hyperviseur open source qui permet de créer des machines virtuelles (VMs).  
 **Analogie :** C'est comme un immeuble qui contient plusieurs appartements (VMs).  
 **Dans ce projet :** Proxmox fait tourner les 3 serveurs.
+
+---
+
+### Qdrant
+**En simple :** Une base de données vectorielle pour la recherche sémantique (alternative à Pinecone).  
+**Analogie :** C'est comme un moteur de recherche qui comprend le sens des mots, pas juste les mots clés.  
+**Dans ce projet :** Qdrant stocke les embeddings pour le RAG (recherche dans les documents).
 
 ---
 
@@ -319,6 +424,20 @@
 
 ## T
 
+### TinyAuth
+**En simple :** Un service d'authentification léger pour Traefik (alternative à Authelia).  
+**Analogie :** C'est comme un gardien simple qui vérifie ton identité avant d'entrer.  
+**Dans ce projet :** TinyAuth protège l'accès aux services web avec un seul mot de passe.
+
+---
+
+### Twenty CRM
+**En simple :** Un CRM open source pour gérer les contacts et candidatures (alternative à Salesforce).  
+**Analogie :** C'est comme un carnet de contacts intelligent qui suit tes relations professionnelles.  
+**Dans ce projet :** Twenty CRM gère les contacts et les candidatures d'emploi.
+
+---
+
 ### Template
 **En simple :** Un modèle de VM préconfiguré. Quand tu crées une VM, elle copie le template.  
 **Analogie :** C'est comme un moule à gâteau : tu verses la pâte et tu obtiens toujours la même forme.  
@@ -346,6 +465,13 @@
 **En simple :** Un ordinateur virtuel qui tourne à l'intérieur d'un autre ordinateur.  
 **Analogie :** C'est comme un appartement dans un immeuble : chaque VM a son propre espace.  
 **Dans ce projet :** Chaque service tourne dans sa propre VM.
+
+---
+
+### Vaultwarden
+**En simple :** Un gestionnaire de mots de passe auto-hébergé (alternative à 1Password, Bitwarden).  
+**Analogie :** C'est comme un coffre-fort numérique qui stocke tous tes mots de passe.  
+**Dans ce projet :** Vaultwarden gère les mots de passe de façon chiffrée et synchronisée.
 
 ---
 

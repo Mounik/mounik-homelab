@@ -33,10 +33,18 @@ all:
           ansible_host: 192.168.20.101
           ansible_user: admin
           role: monitoring
+        authentik:
+          ansible_host: 192.168.20.102
+          ansible_user: admin
+          role: authentik
         vaultwarden:
           ansible_host: 192.168.20.103
           ansible_user: admin
           role: vaultwarden
+        cloudflare-tunnel:
+          ansible_host: 192.168.20.104
+          ansible_user: admin
+          role: cloudflare-tunnel
 
     # --- Cluster k3s ---
     k3s_server:

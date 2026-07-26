@@ -17,7 +17,7 @@ module "k3s_node01" {
   vm_name        = "k3s-node01"
   vm_id          = 200
   node_name      = var.pve02_node
-  template_name  = var.template_name
+
   cpu_cores      = 4
   memory_mb      = 24576  # 24 Go pour K8s
   disk_gb        = 100
@@ -42,7 +42,6 @@ module "paperless" {
   vm_name        = "paperless"
   vm_id          = 210
   node_name      = var.pve02_node
-  template_name  = var.template_name
   cpu_cores      = 2
   memory_mb      = 4096
   disk_gb        = 50
@@ -60,7 +59,7 @@ module "immich" {
   vm_name        = "immich"
   vm_id          = 211
   node_name      = var.pve02_node
-  template_name  = var.template_name
+
   cpu_cores      = 4
   memory_mb      = 4096
   disk_gb        = 80
@@ -78,7 +77,6 @@ module "nextcloud" {
   vm_name        = "nextcloud"
   vm_id          = 212
   node_name      = var.pve02_node
-  template_name  = var.template_name
   cpu_cores      = 2
   memory_mb      = 4096
   disk_gb        = 100
@@ -96,7 +94,6 @@ module "twenty_crm" {
   vm_name        = "twenty-crm"
   vm_id          = 213
   node_name      = var.pve02_node
-  template_name  = var.template_name
   cpu_cores      = 2
   memory_mb      = 4096
   disk_gb        = 30
@@ -114,7 +111,7 @@ module "actual_budget" {
   vm_name        = "actual-budget"
   vm_id          = 214
   node_name      = var.pve02_node
-  template_name  = var.template_name
+
   cpu_cores      = 1
   memory_mb      = 1024
   disk_gb        = 10
@@ -132,7 +129,6 @@ module "home_assistant" {
   vm_name        = "home-assistant"
   vm_id          = 215
   node_name      = var.pve02_node
-  template_name  = var.template_name
   cpu_cores      = 2
   memory_mb      = 2048
   disk_gb        = 20
@@ -150,7 +146,6 @@ module "plex" {
   vm_name        = "plex"
   vm_id          = 216
   node_name      = var.pve02_node
-  template_name  = var.template_name
   cpu_cores      = 2
   memory_mb      = 4096
   disk_gb        = 30

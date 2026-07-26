@@ -12,13 +12,14 @@
     state: absent
 
 - name: Ajouter la clé GPG Docker
-  apt_key:
+  ansible.builtin.get_url:
     url: https://download.docker.com/linux/debian/gpg
-    state: present
+    dest: /etc/apt/keyrings/docker.asc
+    mode: '0644'
 
 - name: Ajouter le dépôt Docker
-  apt_repository:
-    repo: "deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
     state: present
     update_cache: yes
 
@@ -33,9 +34,9 @@
     state: present
     update_cache: yes
 
-- name: Ajouter l'utilisateur mounik au groupe docker
+- name: Ajouter l'utilisateur admin au groupe docker
   user:
-    name: mounik
+    name: admin
     groups: docker
     append: yes
 

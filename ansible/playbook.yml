@@ -91,7 +91,17 @@
       tags: [jobsync, career]
 
 # =============================================================================
-# ÉTAPE 6: Infrastructure pve01 (Docker)
+# ÉTAPE 6: Authentik (IAM Enterprise)
+# =============================================================================
+- name: Déploiement Authentik IAM
+  hosts: authentik
+  become: yes
+  roles:
+    - role: authentik
+      tags: [authentik, auth, iam]
+
+# =============================================================================
+# ÉTAPE 7: Infrastructure pve01 (Docker)
 # =============================================================================
 - name: Configuration Infrastructure (pve01)
   hosts: infrastructure
@@ -111,7 +121,7 @@
       when: role == 'monitoring'
 
 # =============================================================================
-# ÉTAPE 6: Sécurité (toutes les VMs)
+# ÉTAPE 8: Sécurité (toutes les VMs)
 # =============================================================================
 - name: Firewall et mises à jour de sécurité
   hosts: all

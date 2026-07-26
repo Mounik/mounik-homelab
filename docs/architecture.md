@@ -54,6 +54,7 @@ C'est le **serveur de sécurité et d'infrastructure**. Il fait tourner les serv
 |------------------|-------|------------------|-------|-------------|
 | traefik          | 100   | 192.168.20.100   | 2 Go  | Reverse proxy — le "guichet d'accueil" qui redirige le trafic |
 | monitoring       | 101   | 192.168.20.101   | 4 Go  | Prometheus + Grafana + Loki + Alertmanager |
+| authentik        | 102   | 192.168.20.102   | 2 Go  | SSO & authentification enterprise |
 | vaultwarden      | 103   | 192.168.20.103   | 1 Go  | Gestionnaire de mots de passe |
 | cloudflare-tunnel| 104   | 192.168.20.104   | 512 Mo| Tunnel sécurisé vers Internet |
 
@@ -69,10 +70,14 @@ C'est le **serveur de données personnelles**. Il héberge tes photos, documents
 | **k3s-node01**   | 200   | 192.168.20.200   | 24 Go | Nœud principal du cluster Kubernetes |
 | paperless        | 210   | 192.168.30.100   | 4 Go  | Scanner et organiser les documents |
 | immich           | 211   | 192.168.30.101   | 4 Go  | Photos personnelles (comme Google Photos) |
+| nextcloud        | 212   | 192.168.30.102   | 4 Go  | Cloud personnel (fichiers, calendrier, contacts) |
 | twenty-crm       | 213   | 192.168.30.103   | 4 Go  | Contacts et candidatures d'emploi |
+| actual-budget    | 214   | 192.168.30.104   | 1 Go  | Gestion financière personnelle |
+| home-assistant   | 215   | 192.168.30.105   | 2 Go  | Domotique et automatisations maison |
+| plex             | 216   | 192.168.30.106   | 4 Go  | Média serveur (films, séries, musique) |
 
 **Pourquoi pve02 a plus de RAM (32 Go) ?**
-Parce qu'il fait tourner Kubernetes (24 Go) + les applications personnelles (8 Go). Kubernetes est gourmand en mémoire.
+Parce qu'il fait tourner Kubernetes (24 Go) + les applications personnelles (~8 Go). Kubernetes est gourmand en mémoire.
 
 ### pve03 — AI + k3s Node 02 (32 Go RAM)
 
@@ -81,8 +86,11 @@ C'est le **serveur d'intelligence artificielle**. Il héberge les modèles d'IA 
 | Service          | VM ID | IP               | RAM   | Description |
 |------------------|-------|------------------|-------|-------------|
 | **k3s-node02**   | 300   | 192.168.20.210   | 24 Go | Nœud secondaire du cluster Kubernetes |
-| ollama           | 310   | 192.168.40.100   | 8 Go  | Proxy API IA (OpenAI, Anthropic, Mistral) |
+| ollama           | 310   | 192.168.40.100   | 8 Go  | Runner de modèles locaux (Llama, Mistral, etc.) |
 | open-webui       | 311   | 192.168.40.101   | 4 Go  | Interface de chat IA (comme ChatGPT) |
+| qdrant           | 312   | 192.168.40.102   | 4 Go  | Base vectorielle pour la recherche sémantique |
+| langgraph        | 313   | 192.168.40.103   | 4 Go  | Framework d'agents IA autonomes |
+| n8n              | 314   | 192.168.40.104   | 2 Go  | Automatisation de workflows |
 | jobsync          | 315   | 192.168.40.105   | 2 Go  | Tracker de candidatures d'emploi |
 
 ---
@@ -253,13 +261,18 @@ Ansible (configuration système + k3s + services)
     │  (16 Go)    │   │  (32 Go)    │   │  (32 Go)    │
     │  Docker     │   │  k3s Node1  │   │  k3s Node2  │
     │             │   │  + Docker   │   │  + Docker   │
-    ├─────────────┤   ├─────────────┤   ├─────────────┤
-    │ Traefik     │   │ GitLab CE   │   │ Ollama      │
-    │ Monitoring  │   │ ArgoCD      │   │ OpenWebUI   │
-    │ Vaultwarden │   │ Harbor      │   │ Qdrant      │
-    │ Cloudflare  │   │ Paperless   │   │ LangGraph   │
-    │             │   │ Immich      │   │             │
-    └─────────────┘   └─────────────┘   └─────────────┘
+     ├─────────────┤   ├─────────────┤   ├─────────────┤
+     │ Traefik     │   │ GitLab CE   │   │ Ollama      │
+     │ Monitoring  │   │ ArgoCD      │   │ OpenWebUI   │
+     │ Authentik   │   │ Harbor      │   │ Qdrant      │
+     │ Vaultwarden │   │ Paperless   │   │ LangGraph   │
+     │ CrowdSec    │   │ Immich      │   │ n8n         │
+     │ TinyAuth    │   │ Nextcloud   │   │ JobSync     │
+     │ Cloudflare  │   │ Twenty CRM  │   │             │
+     │             │   │ Actual      │   │             │
+     │             │   │ Home Assist.│   │             │
+     │             │   │ Plex        │   │             │
+     └─────────────┘   └─────────────┘   └─────────────┘
            │                 │                 │
            └─────────────────┴─────────────────┘
                              │

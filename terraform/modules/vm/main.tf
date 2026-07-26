@@ -19,15 +19,10 @@ variable "node_name" {
   type        = string
 }
 
-variable "target_node" {
-  description = "Nœud Proxmox (alias pour node_name)"
-  type        = string
-  default     = ""
-}
-
-variable "template_name" {
-  description = "Nom du template à cloner"
-  type        = string
+variable "template_vm_id" {
+  description = "ID du template à cloner"
+  type        = number
+  default     = 9000
 }
 
 variable "cpu_cores" {
@@ -58,12 +53,6 @@ variable "gateway" {
   type        = string
 }
 
-variable "dns_servers" {
-  description = "Serveurs DNS"
-  type        = list(string)
-  default     = ["1.1.1.1", "1.0.0.1"]
-}
-
 variable "ssh_public_key" {
   description = "Clé publique SSH"
   type        = string
@@ -75,27 +64,11 @@ variable "datastore_id" {
   default     = "local-lvm"
 }
 
-variable "vlan_tag" {
-  description = "Tag VLAN (null = pas de VLAN)"
-  type        = number
-  default     = null
-}
-
 variable "disks" {
   description = "Liste des disques"
   type = list(object({
     size    = string
     datastore_id = string
-  }))
-  default = []
-}
-
-variable "network_interfaces" {
-  description = "Interfaces réseau"
-  type = list(object({
-    model  = string
-    bridge = string
-    vlan_tag = number
   }))
   default = []
 }
@@ -112,11 +85,6 @@ variable "description" {
   default     = ""
 }
 
-# --- Locals ---
-locals {
-  target = var.target_node != "" ? var.target_node : var.node_name
-}
-
 # --- Cloud-Init Config ---
 data "cloudinit_config" "vm_config" {
   gzip          = false
@@ -127,7 +95,7 @@ data "cloudinit_config" "vm_config" {
     content = templatefile("${path.module}/../templates/debian-cloud-init.yaml.tpl", {
       ip_address     = var.ip_address
       gateway        = var.gateway
-      dns_servers    = var.dns_servers
+      dns_servers    = ["1.1.1.1", "1.0.0.1"]
       ssh_public_key = var.ssh_public_key
     })
   }
@@ -137,7 +105,7 @@ data "cloudinit_config" "vm_config" {
 resource "proxmox_virtual_environment_vm" "vm" {
   name      = var.vm_name
   vm_id     = var.vm_id
-  node_name = local.target
+  node_name = var.node_name
   description = var.description
 
   tags = var.tags
@@ -153,12 +121,6 @@ resource "proxmox_virtual_environment_vm" "vm" {
   # Cloud-init
   initialization {
     datastore_id = var.datastore_id
-    ip_config {
-      ipv4 {
-        address = "${var.ip_address}/24"
-        gateway = var.gateway
-      }
-    }
     user_data_file_id = data.cloudinit_config.vm_config.id
   }
 
@@ -194,17 +156,6 @@ resource "proxmox_virtual_environment_vm" "vm" {
   network_device {
     bridge     = "vmbr0"
     model      = "virtio"
-    vlan_tag   = var.vlan_tag
-  }
-
-  # Network - Interfaces supplémentaires
-  dynamic "network_device" {
-    for_each = var.network_interfaces
-    content {
-      bridge   = network_device.value.bridge
-      model    = network_device.value.model
-      vlan_tag = network_device.value.vlan_tag
-    }
   }
 
   # BIOS
@@ -246,5 +197,5 @@ output "ip_address" {
 }
 
 output "node_name" {
-  value = local.target
+  value = var.node_name
 }

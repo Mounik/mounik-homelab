@@ -17,12 +17,14 @@
     src: docker-compose.yml.j2
     dest: /opt/traefik/docker-compose.yml
     mode: '0644'
+  notify: restart traefik
 
 - name: Déployer la configuration Traefik
   template:
     src: traefik.yml.j2
     dest: /opt/traefik/config/traefik.yml
     mode: '0644'
+  notify: restart traefik
 
 - name: Déployer les dynamic configs
   template:
@@ -32,12 +34,14 @@
   loop:
     - { src: "dynamic/middlewares.yml.j2", dest: "dynamic/middlewares.yml" }
     - { src: "dynamic/tls.yml.j2", dest: "dynamic/tls.yml" }
+  notify: restart traefik
 
 - name: Déployer le fichier .env
   template:
     src: env.j2
     dest: /opt/traefik/.env
     mode: '0600'
+  notify: restart traefik
 
 - name: Démarrer Traefik
   community.docker.docker_compose_v2:

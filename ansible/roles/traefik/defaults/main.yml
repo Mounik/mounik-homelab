@@ -15,6 +15,14 @@ traefik_cloudflare_api_key: ""
 traefik_authentik_url: "http://192.168.20.102:9000"
 traefik_authentik_secret: ""
 
+# CrowdSec (cross-role dependency)
+crowdsec_bouncer_api_key: ""
+crowdsec_lapi_port: "8080"
+crowdsec_appsec_port: "7422"
+crowdsec_trusted_ips:
+  - "127.0.0.1"
+  - "192.168.0.0/16"
+
 # Dashboard
 traefik_dashboard_enabled: true
 traefik_dashboard_auth: ""

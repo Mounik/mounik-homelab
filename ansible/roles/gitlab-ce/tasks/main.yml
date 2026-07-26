@@ -45,6 +45,12 @@
           maxReplicas: 1
       gitlab-runner:
         install: false
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            memory: 256Mi
       prometheus:
         install: false
       gitlab:
@@ -73,13 +79,6 @@
               memory: 350Mi
             limits:
               memory: 600Mi
-      gitlab-runner:
-        resources:
-          requests:
-            cpu: 100m
-            memory: 128Mi
-          limits:
-            memory: 256Mi
     timeout: 600s
 
 - name: Attendre que GitLab soit prêt

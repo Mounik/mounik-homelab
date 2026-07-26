@@ -87,7 +87,7 @@ Utilisateur → Traefik →识别 le sous-domaine → Bon service
 ```
 
 **Pourquoi c'est nécessaire ?**  
-- J'ai 17 services, chacun avec son sous-domaine  
+- J'ai 22 services, chacun avec son sous-domaine  
 - Traefik gère automatiquement les certificats SSL/TLS  
 - Il empêche les attaques de type "header injection"
 

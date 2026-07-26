@@ -3,7 +3,7 @@
 
 # --- Utilisateur ---
 users:
-  - name: mounik
+  - name: admin
     sudo: ALL=(ALL) NOPASSWD:ALL
     shell: /bin/bash
     groups: sudo, docker
@@ -18,9 +18,14 @@ network:
       dhcp4: false
       addresses:
         - ${ip_address}/24
-      gateway4: ${gateway}
+      routes:
+        - to: default
+          via: ${gateway}
       nameservers:
-        addresses: ${dns_servers}
+        addresses:
+          %{ for dns in dns_servers ~}
+          - ${dns}
+          %{ endfor ~}
 
 # --- Packages ---
 package_update: true
@@ -48,7 +53,7 @@ disable_root: false
 runcmd:
   # Installer Docker
   - curl -fsSL https://get.docker.com | sh
-  - usermod -aG docker mounik
+  - usermod -aG docker admin
   # Installer Docker Compose plugin
   - apt-get install -y docker-compose-plugin
   # Activer Docker

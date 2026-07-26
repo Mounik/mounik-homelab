@@ -28,18 +28,21 @@
     src: docker-compose.yml.j2
     dest: /opt/crowdsec/docker-compose.yml
     mode: '0644'
+  notify: restart crowdsec
 
 - name: Déployer la configuration d'acquisition des logs
   template:
     src: acquis.yaml.j2
     dest: /opt/crowdsec/etc/acquis.yaml
     mode: '0644'
+  notify: restart crowdsec
 
 - name: Déployer la configuration CrowdSec
   template:
     src: config.yaml.j2
     dest: /opt/crowdsec/etc/config.yaml
     mode: '0644'
+  notify: restart crowdsec
 
 - name: Déployer logrotate pour Traefik
   template:

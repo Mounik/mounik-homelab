@@ -20,7 +20,7 @@ C'est exactement ça : un **cloud personnel** — un petit serveur qui vit chez 
 - 📁 **Stocker mes fichiers** (comme Google Drive, mais en local)
 - 📷 **Sauvegarder mes photos** (comme Google Photos, mais sans Google)
 - 🔐 **Gérer mes mots de passe** (comme 1Password, mais en local)
-- 🤖 **Discuter avec une IA** (comme ChatGPT, mais en utilisant les API cloud)
+- 🤖 **Discuter avec une IA** (comme ChatGPT, mais en local avec Ollama ou via les API cloud)
 - 📋 **Organiser mes documents** (comme un scanner + classeur intelligent)
 - 💼 **Suivre mes candidatures** (un tracker d'emploi personnel)
 - 🏠 **Piloter ma maison** (domotique, automatisations)
@@ -154,14 +154,22 @@ Chaque service a son propre sous-domaine, comme des appartements dans un immeubl
 | `twenty.mounik.ovh` | Twenty CRM | Contacts |
 | `actual.mounik.ovh` | Actual Budget | Finance |
 | `nextcloud.mounik.ovh` | Nextcloud | Cloud |
+| `home-assistant.mounik.ovh` | Home Assistant | Domotique |
+| `plex.mounik.ovh` | Plex | Médias |
 | `gitlab.mounik.ovh` | GitLab CE | Code |
 | `argocd.mounik.ovh` | ArgoCD | Déploiement |
 | `harbor.mounik.ovh` | Harbor | Registry |
+| `ollama.mounik.ovh` | Ollama | IA locale |
 | `openwebui.mounik.ovh` | OpenWebUI | Interface IA |
+| `qdrant.mounik.ovh` | Qdrant | Base vectorielle |
+| `langgraph.mounik.ovh` | LangGraph | Agents IA |
 | `jobsync.mounik.ovh` | JobSync | Candidatures |
 | `n8n.mounik.ovh` | n8n | Automatisation |
 | `grafana.mounik.ovh` | Grafana | Monitoring |
 | `wazuh.mounik.ovh` | Wazuh | Sécurité |
+| `authentik.mounik.ovh` | Authentik | SSO & IAM |
+| `tinyauth.mounik.ovh` | TinyAuth | Authentification |
+| `traefik.mounik.ovh` | Traefik | Dashboard proxy |
 
 ---
 
@@ -173,10 +181,10 @@ Mon serveur est un **Intel i5-12600H avec 32 Go de RAM** — c'est un bon ordina
 
 ### La solution
 
-Utiliser les **API cloud** (OpenAI, Anthropic, Mistral) via un proxy local. C'est :
-- **Plus performant** — les modèles cloud sont 10x plus puissants
+**Ollama** fait tourner des modèles d'IA directement sur le serveur (Llama, Mistral, Phi). Pour les tâches complexes, j'utilise les **API cloud** (OpenAI, Anthropic) via LangGraph :
+- **Modèles locaux** — pas besoin d'internet, pas de coût par token
+- **API cloud** — pour les tâches nécessitant plus de puissance
 - **Plus réaliste** — c'est ce que font les entreprises en vrai
-- **Plus économique** — pas besoin de acheter 10 000€ de GPU
 
 ### Architecture
 
@@ -253,8 +261,8 @@ Disque dur externe (chiffré, à la maison)
 
 ### Ce qui est sauvegardé
 
-- **Quotidiennement** — VMs complètes
-- **Hebdomadairement** — données critiques (Vaultwarden, photos, documents)
+- **Quotidiennement** — données critiques (Vaultwarden, photos, documents)
+- **Hebdomadairement** — VMs complètes
 - **Chiffrement** — AES-256 (le même standard que les banques)
 
 ---
@@ -271,6 +279,8 @@ Disque dur externe (chiffré, à la maison)
 | **Nextcloud** | Cloud personnel | Google Drive sans Google |
 | **Twenty CRM** | Contacts et candidatures | Suivre mes contacts et emplois |
 | **Actual Budget** | Gestion financière | Savoir où va mon argent |
+| **Home Assistant** | Domotique | Piloter la maison intelligente |
+| **Plex** | Média serveur | Streamer films, séries, musique |
 
 ### Développement
 
@@ -285,9 +295,10 @@ Disque dur externe (chiffré, à la maison)
 | Service | Ce que c'est | Pourquoi |
 |---------|-------------|----------|
 | **OpenWebUI** | Interface de chat IA | Discuter avec l'IA facilement |
-| **Ollama** | Proxy API IA | Centraliser les appels aux modèles cloud |
+| **Ollama** | Runner de modèles locaux | Faire tourner des modèles IA sans cloud |
 | **LangGraph** | Agent IA | Créer des assistants intelligents |
 | **n8n** | Automatisation | Connecter les services entre eux |
+| **JobSync** | Tracker candidatures | Suivre les candidatures d'emploi |
 
 ### Sécurité & Monitoring
 
@@ -295,11 +306,9 @@ Disque dur externe (chiffré, à la maison)
 |---------|-------------|----------|
 | **Traefik** | Reverse proxy | Diriger le trafic vers les bonnes apps |
 | **TinyAuth** | Authentification | Un seul mot de passe pour tout |
+| **Authentik** | SSO & IAM | Authentification enterprise |
 | **CrowdSec** | IDS/IPS | Détecter et bloquer les intrusions |
-| **Prometheus** | Collecte de métriques | Surveiller CPU, RAM, disque, containers |
-| **Grafana** | Tableaux de bord | Visualiser les métriques en temps réel |
-| **Loki** | Agrégation de logs | Centraliser et chercher dans les logs |
-| **Alertmanager** | Alertes | Recevoir des notifications en cas de problème |
+| **Monitoring** | Prometheus + Grafana + Loki + Alertmanager | Surveiller l'ensemble du stack |
 | **Wazuh** | SIEM | Détecter les menaces avancées |
 
 ---
@@ -428,22 +437,30 @@ ssh-copy-id -i ~/.ssh/mounik-homelab.pub root@192.168.1.22
 mounik-homelab/
 ├── README.md                    # Ce fichier
 ├── mkdocs.yml                   # Configuration documentation
-├── .github/workflows/docs.yml   # Déploiement GitHub Pages
 ├── scripts/deploy.sh            # Script de déploiement
 ├── docs/                        # Documentation détaillée
+│   ├── index.md                 # Page d'accueil
 │   ├── architecture.md          # Architecture technique
 │   ├── network.md               # Réseau, VLANs, sous-domaines
 │   ├── security.md              # Sécurité détaillée
-│   └── disaster-recovery.md     # Sauvegardes et restauration
+│   ├── disaster-recovery.md     # Sauvegardes et restauration
+│   ├── services.md              # Guide des services
+│   └── glossary.md              # Glossaire technique
 ├── terraform/                   # Infrastructure as Code (OpenTofu)
+│   ├── providers.tf             # Configuration Proxmox
+│   ├── variables.tf             # Variables
+│   ├── outputs.tf               # Sorties
+│   ├── versions.tf              # Versions providers
+│   ├── main.tf                  # Orchestration
 │   ├── pve01-infra.tf           # VMs infrastructure
 │   ├── pve02-cloud.tf           # VMs services personnels
 │   ├── pve03-ai-devops.tf       # VMs IA & DevOps
+│   ├── templates/               # Templates cloud-init
 │   └── modules/vm/              # Module VM réutilisable
 ├── ansible/                     # Configuration automatisée
 │   ├── inventory.yml            # Liste des serveurs
 │   ├── playbook.yml             # Instructions de configuration
-│   └── roles/                   # Rôles (base, docker, k3s, etc.)
+│   └── roles/                   # 15 rôles (base, docker, k3s, etc.)
 └── diagrams/                    # Schémas d'architecture
 ```
 

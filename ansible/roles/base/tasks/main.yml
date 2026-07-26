@@ -22,7 +22,6 @@
       - python3
       - python3-pip
       - openssh-server
-      - ufw
       - rsync
       - tmux
       - unzip

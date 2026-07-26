@@ -25,12 +25,14 @@
     src: docker-compose.yml.j2
     dest: /opt/tinyauth/docker-compose.yml
     mode: '0644'
+  notify: restart tinyauth
 
 - name: Déployer le fichier .env
   template:
     src: env.j2
     dest: /opt/tinyauth/.env
     mode: '0600'
+  notify: restart tinyauth
 
 - name: Créer le réseau Docker frontend
   command: docker network create frontend

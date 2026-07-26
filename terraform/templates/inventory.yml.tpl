@@ -9,7 +9,7 @@ all:
 %{ if vm.role == "infra" ~}
         ${name}:
           ansible_host: ${vm.ip}
-          ansible_user: mounik
+          ansible_user: admin
           ansible_python_interpreter: /usr/bin/python3
           pve_node: ${vm.node}
 %{ endif ~}
@@ -21,7 +21,7 @@ all:
 %{ if vm.role == "app" ~}
         ${name}:
           ansible_host: ${vm.ip}
-          ansible_user: mounik
+          ansible_user: admin
           ansible_python_interpreter: /usr/bin/python3
           pve_node: ${vm.node}
 %{ endif ~}
@@ -33,19 +33,19 @@ all:
 %{ if vm.role == "ai" ~}
         ${name}:
           ansible_host: ${vm.ip}
-          ansible_user: mounik
+          ansible_user: admin
           ansible_python_interpreter: /usr/bin/python3
           pve_node: ${vm.node}
 %{ endif ~}
 %{ endfor ~}
 
-    devops:
+    k8s:
       hosts:
 %{ for name, vm in vms ~}
-%{ if vm.role == "devops" ~}
+%{ if vm.role == "k8s" ~}
         ${name}:
           ansible_host: ${vm.ip}
-          ansible_user: mounik
+          ansible_user: admin
           ansible_python_interpreter: /usr/bin/python3
           pve_node: ${vm.node}
 %{ endif ~}

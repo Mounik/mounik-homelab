@@ -3,10 +3,6 @@
 # =============================================================================
 
 # --- Variables locales ---
-variable "ssh_public_key" {
-  type = string
-}
-
 variable "pve01_node" {
   type    = string
   default = "pve01"
@@ -20,7 +16,6 @@ module "traefik" {
   vm_name        = "traefik"
   vm_id          = 100
   node_name      = var.pve01_node
-  template_name  = var.template_name
   cpu_cores      = 2
   memory_mb      = 2048
   disk_gb        = 20
@@ -38,7 +33,7 @@ module "monitoring" {
   vm_name        = "monitoring"
   vm_id          = 101
   node_name      = var.pve01_node
-  template_name  = var.template_name
+
   cpu_cores      = 4
   memory_mb      = 4096
   disk_gb        = 50
@@ -60,7 +55,6 @@ module "authentik" {
   vm_name        = "authentik"
   vm_id          = 102
   node_name      = var.pve01_node
-  template_name  = var.template_name
   cpu_cores      = 2
   memory_mb      = 2048
   disk_gb        = 20
@@ -78,7 +72,7 @@ module "vaultwarden" {
   vm_name        = "vaultwarden"
   vm_id          = 103
   node_name      = var.pve01_node
-  template_name  = var.template_name
+
   cpu_cores      = 1
   memory_mb      = 1024
   disk_gb        = 10
@@ -96,7 +90,7 @@ module "cloudflare_tunnel" {
   vm_name        = "cloudflare-tunnel"
   vm_id          = 104
   node_name      = var.pve01_node
-  template_name  = var.template_name
+
   cpu_cores      = 1
   memory_mb      = 512
   disk_gb        = 10
