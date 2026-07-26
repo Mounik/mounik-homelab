@@ -296,8 +296,10 @@ Disque dur externe (chiffré, à la maison)
 | **Traefik** | Reverse proxy | Diriger le trafic vers les bonnes apps |
 | **TinyAuth** | Authentification | Un seul mot de passe pour tout |
 | **CrowdSec** | IDS/IPS | Détecter et bloquer les intrusions |
-| **Prometheus** | Métriques | Surveiller la santé du serveur |
-| **Grafana** | Tableaux de bord | Visualiser les données |
+| **Prometheus** | Collecte de métriques | Surveiller CPU, RAM, disque, containers |
+| **Grafana** | Tableaux de bord | Visualiser les métriques en temps réel |
+| **Loki** | Agrégation de logs | Centraliser et chercher dans les logs |
+| **Alertmanager** | Alertes | Recevoir des notifications en cas de problème |
 | **Wazuh** | SIEM | Détecter les menaces avancées |
 
 ---
@@ -462,7 +464,7 @@ mounik-homelab/
 - [x] Traefik (reverse proxy)
 - [ ] Cloudflare Tunnel
 - [ ] Authentik (IAM complet)
-- [ ] Monitoring (Prometheus + Grafana)
+- [x] Monitoring (Prometheus + Grafana + Loki + Alertmanager)
 
 ### Phase 3 — Services personnels
 

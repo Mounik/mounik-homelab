@@ -274,18 +274,31 @@ Ces services surveillent et protègent l'infrastructure.
 
 ---
 
-### Prometheus + Grafana — Monitoring
+### Prometheus + Grafana + Loki — Monitoring
 
-**Ce que c'est :** Des outils de surveillance qui collectent et affichent les métriques de ton infrastructure.
+**Ce que c'est :** Une stack complète de surveillance qui collecte les métriques, les logs, et envoie des alertes en cas de problème.
 
 **Pourquoi ?**  
 - Savoir si tes serveurs fonctionnent correctement  
 - Détecter les problèmes avant qu'ils n'impactent les utilisateurs  
 - Visualiser les tendances (CPU, RAM, disque)  
-- Recevoir des alertes en cas de problème
+- Centraliser les logs de tous les services  
+- Recevoir des alertes en cas de problème  
+
+**Composants :**
+
+| Service | Rôle | Port |
+|---------|------|------|
+| Prometheus | Collecte de métriques | 9090 |
+| Grafana | Tableaux de bord | 3000 |
+| Loki | Agrégation de logs | 3100 |
+| Promtail | Collecte de logs → Loki | 9080 |
+| Alertmanager | Envoi d'alertes (email) | 9093 |
+| Node Exporter | Métriques système | 9100 |
+| cAdvisor | Métriques containers | 8080 |
 
 **Sous-domaine :** `grafana.mounik.ovh`  
-**Technologie :** Go, Docker, ports 9090 (Prometheus), 3000 (Grafana)
+**Technologie :** Go, Docker, 7 containers
 
 ---
 
@@ -325,5 +338,8 @@ Ces services surveillent et protègent l'infrastructure.
 | **Sécurité & Monitoring** | Traefik | `traefik.mounik.ovh` | Nginx, HAProxy |
 | | TinyAuth | `tinyauth.mounik.ovh` | Authelia |
 | | CrowdSec | — | Fail2Ban |
-| | Prometheus + Grafana | `grafana.mounik.ovh` | Datadog |
+| | Prometheus | — | — |
+| | Grafana | `grafana.mounik.ovh` | Datadog |
+| | Loki | — | ELK Stack |
+| | Alertmanager | — | PagerDuty |
 | | Wazuh | `wazuh.mounik.ovh` | Splunk |

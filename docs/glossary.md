@@ -23,6 +23,13 @@
 
 ---
 
+### Alertmanager
+**En simple :** Un outil qui reçoit les alertes de Prometheus et les envoie par email (ou d'autres canaux).  
+**Analogie :** C'est comme une alarme incendie qui préven les pompiers quand il y a un problème.  
+**Dans ce projet :** Alertmanager envoie des alertes par email quand un service est down ou qu'une métrique est anormale.
+
+---
+
 ## C
 
 ### CI/CD (Continuous Integration / Continuous Deployment)
@@ -115,6 +122,13 @@
 
 ---
 
+### Grafana
+**En simple :** Un outil qui affiche des tableaux de bord visuels avec les métriques collectées par Prometheus.  
+**Analogie :** C'est comme un écran de contrôle dans un cockpit d'avion : tu vois tout d'un coup d'œil.  
+**Dans ce projet :** Grafana affiche les dashboards de surveillance du homelab (CPU, RAM, disque, containers).
+
+---
+
 ## H
 
 ### Helm
@@ -169,6 +183,13 @@
 **En simple :** Un système de stockage distribué pour Kubernetes. Les données sont réparties entre les serveurs.  
 **Analogie :** C'est comme un coffre-fort distribué : les données sont en plusieurs morceaux sur différents serveurs.  
 **Dans ce projet :** Longhorn stocke les données des applications Kubernetes.
+
+---
+
+### Loki
+**En simple :** Un outil qui agrège les logs (journaux) de tous tes services. C'est l'équivalent de l'ELK Stack mais plus léger.  
+**Analogie :** C'est comme une bibliothèque qui range tous les journaux de bord dans des étagères.  
+**Dans ce projet :** Loki centralise les logs de tous les services et permet de les chercher via Grafana.
 
 ---
 
@@ -233,6 +254,20 @@
 **En simple :** L'unité de base dans Kubernetes. Un pod contient un ou plusieurs conteneurs qui tournent ensemble.  
 **Analogie :** C'est comme une chambre d'hôtel : elle contient tout ce dont un client a besoin (lit, table, chaise).  
 **Dans ce projet :** Chaque application Kubernetes tourne dans un ou plusieurs pods.
+
+---
+
+### Prometheus
+**En simple :** Un outil qui collecte les métriques (CPU, RAM, disque, etc.) de tes serveurs et containers.  
+**Analogie :** C'est comme un compteur electricité qui mesure la consommation de chaque pièce.  
+**Dans ce projet :** Prometheus collecte les métriques de toutes les VMs, containers, et services.
+
+---
+
+### Promtail
+**En simple :** Un collecteur de logs qui envoie les logs à Loki.  
+**Analogie :** C'est comme un facteur qui ramène le courrier au bureau de poste (Loki).  
+**Dans ce projet :** Promtail collecte les logs système et Docker et les envoie à Loki.
 
 ---
 

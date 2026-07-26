@@ -53,7 +53,7 @@ C'est le **serveur de sécurité et d'infrastructure**. Il fait tourner les serv
 | Service          | VM ID | IP               | RAM   | Description |
 |------------------|-------|------------------|-------|-------------|
 | traefik          | 100   | 192.168.20.100   | 2 Go  | Reverse proxy — le "guichet d'accueil" qui redirige le trafic |
-| monitoring       | 101   | 192.168.20.101   | 4 Go  | Prometheus + Grafana — les "caméras de surveillance" |
+| monitoring       | 101   | 192.168.20.101   | 4 Go  | Prometheus + Grafana + Loki + Alertmanager |
 | vaultwarden      | 103   | 192.168.20.103   | 1 Go  | Gestionnaire de mots de passe |
 | cloudflare-tunnel| 104   | 192.168.20.104   | 512 Mo| Tunnel sécurisé vers Internet |
 
@@ -228,7 +228,7 @@ Ansible (configuration système + k3s + services)
 | GitOps | — | ArgoCD |
 | Registry | — | Harbor |
 | Sécurité | CrowdSec | Wazuh + Trivy |
-| Monitoring | Prometheus + Grafana | Prometheus + Grafana |
+| Monitoring | Prometheus + Grafana + Loki | Prometheus + Grafana + Loki |
 | Stockage | Local | Longhorn |
 | LoadBalancer | — | MetalLB |
 
@@ -315,11 +315,27 @@ ansible-playbook -i inventory.yml playbook.yml --tags argocd
 
 ### Monitoring
 
-Prometheus collecte les métriques de :  
-- **Proxmox** — état des VMs, CPU, RAM, disque  
-- **VMs** — node_exporter (métriques système)  
-- **Containers** — cAdvisor (métriques Docker)  
-- **k3s** — metrics-server (métriques Kubernetes)  
-- **Applications** — GitLab, ArgoCD, Harbor (endpoints custom)
+La stack monitoring tourne sur une VM Docker dédiée (pve01, 192.168.20.101) — indépendante du cluster K8s. Si K8s tombe, le monitoring continue de fonctionner.
 
-Grafana affiche les dashboards. Alertmanager envoie les alertes sur Discord/Email.
+| Service | Rôle |
+|---------|------|
+| **Prometheus** | Collecte les métriques (15s d'intervalle) |
+| **Grafana** | Dashboards visualisés |
+| **Loki** | Agrégation de logs |
+| **Promtail** | Collecte de logs → Loki |
+| **Alertmanager** | Envoi d'alertes (email) |
+| **Node Exporter** | Métriques système (CPU, RAM, disque) |
+| **cAdvisor** | Métriques containers Docker |
+
+**Ce qui est surveillé :**
+- **Proxmox** — état des VMs, CPU, RAM, disque
+- **VMs** — node_exporter (métriques système)
+- **Containers** — cAdvisor (métriques Docker)
+- **k3s** — kube-state-metrics (métriques Kubernetes)
+- **Traefik** — métriques HTTP (requêtes, latence, erreurs)
+
+**10 alertes configurées :**
+- CPU > 80%, RAM > 85%, Disque > 85%
+- Container down, crash-looping
+- Service down
+- Nœud K8s not ready, Pod not ready
