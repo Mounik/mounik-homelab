@@ -1,0 +1,72 @@
+# =============================================================================
+# Traefik v3 - Configuration statique
+# Généré par Ansible - mounik-homelab
+# =============================================================================
+
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+
+# Logs
+log:
+  level: {{ traefik_log_level }}
+  format: common
+
+accessLog:
+  filePath: "/logs/traefik.log"
+  format: json
+  filters:
+    statusCodes:
+      - "200-299"
+      - "400-599"
+  fields:
+    headers:
+      defaultMode: drop
+      names:
+        User-Agent: keep
+        X-Real-Ip: keep
+        X-Forwarded-For: keep
+        X-Forwarded-Proto: keep
+
+# Entrypoints
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+  websecure:
+    address: ":443"
+    http:
+      tls:
+        certResolver: cloudflare
+    http3: {}
+
+# Providers
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+    network: "host"
+  file:
+    directory: /etc/traefik/config
+    watch: true
+
+# Certificats
+certificatesResolvers:
+  cloudflare:
+    acme:
+      email: {{ traefik_email }}
+      storage: /acme/acme.json
+      dnsChallenge:
+        provider: cloudflare
+        delayBeforeCheck: 10
+
+# CrowdSec Plugin
+experimental:
+  plugins:
+    bouncer:
+      moduleName: github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
+      version: v1.4.6

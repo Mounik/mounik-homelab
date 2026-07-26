@@ -1,0 +1,22 @@
+---
+# Defaults - CrowdSec
+
+crowdsec_version: "latest"
+crowdsec_collections:
+  - crowdsecurity/traefik
+  - crowdsecurity/http-cve
+  - crowdsecurity/base-http-scenarios
+  - crowdsecurity/sshd
+  - crowdsecurity/linux
+  - crowdsecurity/appsec-generic-rules
+  - crowdsecurity/appsec-virtual-patching
+  - crowdsecurity/appsec-crs
+
+crowdsec_hostname: "mounik-homelab"
+crowdsec_lapi_port: 8181
+crowdsec_appsec_port: 7422
+
+crowdsec_trusted_ips:
+  - "10.0.0.0/8"
+  - "172.16.0.0/12"
+  - "192.168.0.0/16"

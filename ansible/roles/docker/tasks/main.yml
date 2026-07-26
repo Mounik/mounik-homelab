@@ -1,0 +1,64 @@
+---
+# Role: docker - Installation et configuration Docker
+
+- name: Supprimer les anciennes versions de Docker
+  apt:
+    name:
+      - docker
+      - docker-engine
+      - docker.io
+      - containerd
+      - runc
+    state: absent
+
+- name: Ajouter la clé GPG Docker
+  apt_key:
+    url: https://download.docker.com/linux/debian/gpg
+    state: present
+
+- name: Ajouter le dépôt Docker
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
+    state: present
+    update_cache: yes
+
+- name: Installer Docker
+  apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+    update_cache: yes
+
+- name: Ajouter l'utilisateur mounik au groupe docker
+  user:
+    name: mounik
+    groups: docker
+    append: yes
+
+- name: Créer le répertoire de configuration Docker
+  file:
+    path: /etc/docker
+    state: directory
+    mode: '0755'
+
+- name: Configurer le daemon Docker
+  template:
+    src: daemon.json.j2
+    dest: /etc/docker/daemon.json
+    mode: '0644'
+  notify: restart docker
+
+- name: Activer et démarrer Docker
+  systemd:
+    name: docker
+    enabled: yes
+    state: started
+
+- name: Vérifier que Docker fonctionne
+  command: docker info
+  register: docker_info
+  changed_when: false

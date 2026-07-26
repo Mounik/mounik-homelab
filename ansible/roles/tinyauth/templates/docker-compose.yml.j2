@@ -1,0 +1,34 @@
+services:
+  tinyauth:
+    image: ghcr.io/steveiliop56/tinyauth:v4
+    container_name: tinyauth
+    restart: unless-stopped
+    networks:
+      - frontend
+    environment:
+      - APP_URL=https://{{ tinyauth_domain }}
+      - APP_TITLE={{ tinyauth_app_title }}
+      - USERS=${USERS}
+      - SECRET=${SECRET}
+      - LOG_LEVEL={{ tinyauth_log_level }}
+{% if tinyauth_oauth_github_enabled %}
+      - PROVIDERS_GITHUB_CLIENT_ID=${PROVIDERS_GITHUB_CLIENT_ID}
+      - PROVIDERS_GITHUB_CLIENT_SECRET=${PROVIDERS_GITHUB_CLIENT_SECRET}
+      - OAUTH_WHITELIST=${OAUTH_WHITELIST}
+{% endif %}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.tinyauth.rule=Host(`{{ tinyauth_domain }}`)
+      - traefik.http.routers.tinyauth.entrypoints=web
+      - traefik.http.routers.tinyauth-https.rule=Host(`{{ tinyauth_domain }}`)
+      - traefik.http.routers.tinyauth-https.entrypoints=websecure
+      - traefik.http.routers.tinyauth-https.tls=true
+      - traefik.http.routers.tinyauth-https.tls.certresolver=cloudflare
+      - traefik.http.services.tinyauth.loadbalancer.server.port=3000
+      - traefik.http.middlewares.tinyauth.forwardauth.address=http://tinyauth:3000/api/auth/traefik
+
+networks:
+  frontend:
+    external: true

@@ -1,0 +1,7 @@
+---
+# Handlers - Base
+
+- name: restart sshd
+  systemd:
+    name: ssh
+    state: restarted

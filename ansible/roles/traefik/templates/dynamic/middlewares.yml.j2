@@ -1,0 +1,56 @@
+# Middlewares dynamiques
+http:
+  middlewares:
+    # CrowdSec - Protection anti-attaques
+    crowdsec:
+      plugin:
+        bouncer:
+          enabled: true
+          defaultDecisionSeconds: 60
+          remediationStatusCode: 403
+          crowdsecMode: live
+          crowdsecLapiKey: {{ crowdsec_bouncer_api_key | default('CHANGE_ME') }}
+          crowdsecLapiHost: "127.0.0.1:{{ crowdsec_lapi_port }}"
+          crowdsecLapiScheme: http
+          crowdsecLapiTLSInsecureVerify: false
+          crowdsecAppsecEnabled: true
+          crowdsecAppsecHost: "127.0.0.1:{{ crowdsec_appsec_port }}"
+          crowdsecAppsecFailureBlock: true
+          crowdsecAppsecUnreachableBlock: true
+          forwardedHeadersTrustedIPs:
+{% for ip in crowdsec_trusted_ips %}
+            - "{{ ip }}"
+{% endfor %}
+          clientTrustedIPs:
+{% for ip in crowdsec_trusted_ips %}
+            - "{{ ip }}"
+{% endfor %}
+
+    # Sécurité headers
+    secure-headers:
+      headers:
+        stsSeconds: 31536000
+        stsIncludeSubdomains: true
+        stsPreload: true
+        forceSTSHeader: true
+        contentTypeNosniff: true
+        browserXssFilter: true
+        referrerPolicy: "strict-origin-when-cross-origin"
+        frameDeny: true
+
+    # Rate limiting
+    rate-limit:
+      rateLimit:
+        average: 100
+        burst: 50
+
+    # Compression
+    compress:
+      compress: {}
+
+    # Whitelist IP admin
+    admin-whitelist:
+      ipAllowList:
+        sourceRange:
+          - "192.168.1.0/24"
+          - "192.168.10.0/24"

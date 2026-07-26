@@ -1,0 +1,24 @@
+---
+# Defaults - Firewall nftables
+# Variables configurables pour le firewall
+
+# Réseaux autorisés pour l'administration
+firewall_admin_networks:
+  - "192.168.1.0/24"    # Réseau local principal
+  - "192.168.10.0/24"   # VLAN Management
+
+# Ports ouverts sur les VMs (services)
+firewall_allowed_tcp_ports:
+  - 22     # SSH
+  - 80     # HTTP (Traefik)
+  - 443    # HTTPS (Traefik)
+  - 8080   # Traefik dashboard (admin uniquement)
+  - 9090   # Prometheus (admin uniquement)
+  - 3000   # Grafana (admin uniquement)
+
+# Ports UDP autorisés
+firewall_allowed_udp_ports:
+  - 53     # DNS
+
+# IP du nœud Proxmox (sera remplacé par l'inventaire)
+firewall_prometheus_exporter_port: 9100

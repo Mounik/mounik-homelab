@@ -1,0 +1,25 @@
+# =============================================================================
+# terraform.tfvars.example - mounik-homelab
+# Copier en terraform.tfvars et adapter les valeurs
+# =============================================================================
+
+# --- Connexion Proxmox ---
+proxmox_endpoint = "https://192.168.1.20:8006"
+proxmox_username = "root@pam"
+proxmox_password = "CHANGER_CE_MOT_DE_PASSE"
+proxmox_insecure = true
+
+# --- Template ---
+template_name    = "debian-13-template"
+template_vm_id   = 9000
+
+# --- Réseau ---
+gateway          = "192.168.1.254"
+dns_servers      = ["1.1.1.1", "1.0.0.1"]
+
+# --- Storage ---
+datastore_id     = "local-lvm"
+
+# --- SSH ---
+# Générer avec: ssh-keygen -t ed25519 -C "mounik-homelab" -f ~/.ssh/mounik-homelab
+ssh_public_key   = "ssh-ed25519 AAAA... CHANGER"

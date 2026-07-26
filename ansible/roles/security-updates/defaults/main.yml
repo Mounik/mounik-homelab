@@ -1,0 +1,25 @@
+---
+# Defaults - Security Updates
+# Variables configurables pour les mises à jour de sécurité
+
+# Activer les mises à jour automatiques
+security_updates_enabled: true
+
+# Recevoir les emails de notification
+security_updates_email:
+  enabled: false
+  address: ""  # Adapter selon ton email
+
+# Niveaux de mise à jour autorisés
+# "security" = uniquement les correctifs de sécurité
+# "all" = toutes les mises à jour disponibles
+security_updates_level: "security"
+
+# Fenêtre horaire pour les mises à jour (reboot si nécessaire)
+security_updates_reboot: false
+security_updates_reboot_time: "03:00"
+
+# Packages exclus des mises à jour auto
+security_updates_blacklist:
+  - "linux-image*"    # Pas de mise à jour kernel automatique
+  - "linux-headers*"

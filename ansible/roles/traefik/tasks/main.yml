@@ -1,0 +1,46 @@
+---
+# Role: traefik - Déploiement Traefik v3 via Docker Compose
+
+- name: Créer les répertoires Traefik
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - /opt/traefik
+    - /opt/traefik/config
+    - /opt/traefik/acme
+    - /opt/traefik/logs
+
+- name: Déployer docker-compose.yml pour Traefik
+  template:
+    src: docker-compose.yml.j2
+    dest: /opt/traefik/docker-compose.yml
+    mode: '0644'
+
+- name: Déployer la configuration Traefik
+  template:
+    src: traefik.yml.j2
+    dest: /opt/traefik/config/traefik.yml
+    mode: '0644'
+
+- name: Déployer les dynamic configs
+  template:
+    src: "{{ item.src }}"
+    dest: "/opt/traefik/config/{{ item.dest }}"
+    mode: '0644'
+  loop:
+    - { src: "dynamic/middlewares.yml.j2", dest: "dynamic/middlewares.yml" }
+    - { src: "dynamic/tls.yml.j2", dest: "dynamic/tls.yml" }
+
+- name: Déployer le fichier .env
+  template:
+    src: env.j2
+    dest: /opt/traefik/.env
+    mode: '0600'
+
+- name: Démarrer Traefik
+  community.docker.docker_compose_v2:
+    project_src: /opt/traefik
+    state: present
+  register: traefik_compose

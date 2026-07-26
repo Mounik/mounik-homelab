@@ -1,0 +1,44 @@
+---
+# Role: tinyauth - Authentification centralisée légère pour Traefik
+
+- name: Créer les répertoires TinyAuth
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - /opt/tinyauth
+
+- name: Générer le secret TinyAuth
+  command: openssl rand -base64 32 | tr -dc 'a-zA-Z0-9' | head -c 32
+  register: tinyauth_secret_gen
+  changed_when: false
+  when: tinyauth_secret is undefined
+
+- name: Définir le secret
+  set_fact:
+    tinyauth_secret: "{{ tinyauth_secret_gen.stdout }}"
+  when: tinyauth_secret is undefined
+
+- name: Déployer docker-compose.yml
+  template:
+    src: docker-compose.yml.j2
+    dest: /opt/tinyauth/docker-compose.yml
+    mode: '0644'
+
+- name: Déployer le fichier .env
+  template:
+    src: env.j2
+    dest: /opt/tinyauth/.env
+    mode: '0600'
+
+- name: Créer le réseau Docker frontend
+  command: docker network create frontend
+  register: network_create
+  changed_when: "'already exists' not in network_create.stderr"
+  failed_when: false
+
+- name: Démarrer TinyAuth
+  community.docker.docker_compose_v2:
+    project_src: /opt/tinyauth
+    state: present

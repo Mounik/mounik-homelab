@@ -1,0 +1,7 @@
+---
+# Handlers - TinyAuth
+
+- name: restart tinyauth
+  community.docker.docker_compose_v2:
+    project_src: /opt/tinyauth
+    state: restarted

@@ -1,0 +1,20 @@
+# =============================================================================
+# Defaults - Traefik
+# =============================================================================
+
+traefik_domain: "mounik.ovh"
+traefik_email: "laurent@mounik.ovh"
+
+traefik_log_level: "INFO"
+
+# Cloudflare
+traefik_cloudflare_email: ""
+traefik_cloudflare_api_key: ""
+
+# Authentik
+traefik_authentik_url: "http://192.168.20.102:9000"
+traefik_authentik_secret: ""
+
+# Dashboard
+traefik_dashboard_enabled: true
+traefik_dashboard_auth: ""

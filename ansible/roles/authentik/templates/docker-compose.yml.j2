@@ -1,0 +1,87 @@
+services:
+  authentik:
+    image: ghcr.io/goauthentik/server:2024.12
+    container_name: authentik
+    restart: unless-stopped
+    networks:
+      - frontend
+    ports:
+      - "127.0.0.1:{{ authentik_port }}:9000"
+      - "127.0.0.1:9443:9443"
+    volumes:
+      - ./data:/data
+      - ./data/media:/media
+      - ./data/certs:/certs
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - AK_SECRET=${AK_SECRET}
+      - AUTHENTIK_REDIS__HOST=authentik-redis
+      - AUTHENTIK_POSTGRESQL__HOST=authentik-postgres
+      - AUTHENTIK_POSTGRESQL__USER=${PG_USER}
+      - AUTHENTIK_POSTGRESQL__NAME=${PG_DB}
+      - AUTHENTIK_POSTGRESQL__PASSWORD=${PG_PASS}
+      - AUTHENTIK_BOOTSTRAP_PASSWORD=${AK_ADMIN_PASSWORD}
+      - AUTHENTIK_ERROR_REPORTING__ENABLED=false
+      - AUTHENTIK_LOG_LEVEL={{ authentik_log_level }}
+    depends_on:
+      - authentik-redis
+      - authentik-postgres
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.authentik.rule=Host(`{{ authentik_domain }}`)
+      - traefik.http.routers.authentik.entrypoints=web
+      - traefik.http.routers.authentik-https.rule=Host(`{{ authentik_domain }}`)
+      - traefik.http.routers.authentik-https.entrypoints=websecure
+      - traefik.http.routers.authentik-https.tls=true
+      - traefik.http.routers.authentik-https.tls.certresolver=cloudflare
+      - traefik.http.services.authentik.loadbalancer.server.port=9000
+
+  authentik-worker:
+    image: ghcr.io/goauthentik/server:2024.12
+    container_name: authentik-worker
+    restart: unless-stopped
+    networks:
+      - frontend
+    volumes:
+      - ./data:/data
+      - ./data/media:/media
+      - ./data/certs:/certs
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - AK_SECRET=${AK_SECRET}
+      - AUTHENTIK_REDIS__HOST=authentik-redis
+      - AUTHENTIK_POSTGRESQL__HOST=authentik-postgres
+      - AUTHENTIK_POSTGRESQL__USER=${PG_USER}
+      - AUTHENTIK_POSTGRESQL__NAME=${PG_DB}
+      - AUTHENTIK_POSTGRESQL__PASSWORD=${PG_PASS}
+      - AUTHENTIK_ERROR_REPORTING__ENABLED=false
+      - AUTHENTIK_LOG_LEVEL={{ authentik_log_level }}
+    command: worker
+    depends_on:
+      - authentik-redis
+      - authentik-postgres
+
+  authentik-postgres:
+    image: postgres:16
+    container_name: authentik-postgres
+    restart: unless-stopped
+    networks:
+      - frontend
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=${PG_USER}
+      - POSTGRES_PASSWORD=${PG_PASS}
+      - POSTGRES_DB=${PG_DB}
+
+  authentik-redis:
+    image: redis:alpine
+    container_name: authentik-redis
+    restart: unless-stopped
+    networks:
+      - frontend
+    command: --save 60 1 --loglevel warning
+
+networks:
+  frontend:
+    external: true

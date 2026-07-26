@@ -1,0 +1,92 @@
+---
+# Role: crowdsec - Installation et configuration CrowdSec avec Traefik
+
+- name: Installer rsyslog (requis pour Debian 13)
+  apt:
+    name: rsyslog
+    state: present
+
+- name: Activer et démarrer rsyslog
+  systemd:
+    name: rsyslog
+    enabled: yes
+    state: started
+
+- name: Créer les répertoires CrowdSec
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - /opt/crowdsec
+    - /opt/crowdsec/data
+    - /opt/crowdsec/etc
+    - /opt/crowdsec/etc/acquis.d
+
+- name: Déployer docker-compose.yml pour CrowdSec
+  template:
+    src: docker-compose.yml.j2
+    dest: /opt/crowdsec/docker-compose.yml
+    mode: '0644'
+
+- name: Déployer la configuration d'acquisition des logs
+  template:
+    src: acquis.yaml.j2
+    dest: /opt/crowdsec/etc/acquis.yaml
+    mode: '0644'
+
+- name: Déployer la configuration CrowdSec
+  template:
+    src: config.yaml.j2
+    dest: /opt/crowdsec/etc/config.yaml
+    mode: '0644'
+
+- name: Déployer logrotate pour Traefik
+  template:
+    src: logrotate-traefik.j2
+    dest: /etc/logrotate.d/traefik
+    mode: '0644'
+
+- name: Démarrer CrowdSec
+  community.docker.docker_compose_v2:
+    project_src: /opt/crowdsec
+    state: present
+  register: crowdsec_compose
+
+- name: Attendre que CrowdSec soit prêt
+  ansible.builtin.pause:
+    seconds: 10
+
+- name: Vérifier les collections CrowdSec
+  command: docker exec crowdsec cscli collections list
+  register: collections_list
+  changed_when: false
+
+- name: Ajouter le bouncer Traefik
+  command: docker exec crowdsec cscli bouncers add traefik-bouncer
+  register: bouncer_result
+  changed_when: false
+  failed_when: false
+
+- name: Extraire la clé API du bouncer Traefik
+  set_fact:
+    crowdsec_bouncer_api_key: "{{ bouncer_result.stdout_lines[-2] | regex_search('[A-Za-z0-9+/=]{40,}') }}"
+  when: bouncer_result.rc == 0
+
+- name: Ajouter le bouncer firewall
+  command: docker exec crowdsec cscli bouncers add firewall-bouncer
+  register: firewall_bouncer_result
+  changed_when: false
+  failed_when: false
+
+- name: Extraire la clé API du bouncer firewall
+  set_fact:
+    crowdsec_firewall_api_key: "{{ firewall_bouncer_result.stdout_lines[-2] | regex_search('[A-Za-z0-9+/=]{40,}') }}"
+  when: firewall_bouncer_result.rc == 0
+
+- name: Sauvegarder les clés API CrowdSec
+  template:
+    src: crowdsec-keys.env.j2
+    dest: /opt/crowdsec/keys.env
+    mode: '0600'
+  when: crowdsec_bouncer_api_key is defined

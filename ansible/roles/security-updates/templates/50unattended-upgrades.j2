@@ -1,0 +1,35 @@
+// Unattended-Upgrade configuration - mounik-homelab
+// Généré par Ansible - NE PAS MODIFIER MANUELLEMENT
+
+Unattended-Upgrade::Allowed-Origins {
+    "${distro_id}:${distro_codename}-security";
+    "${distro_id}ESMApps:${distro_codename}-apps-security";
+    "${distro_id}ESM:${distro_codename}-infra-security";
+};
+
+// Blacklist des packages à ne pas mettre à jour automatiquement
+Unattended-Upgrade::Package-Blacklist {
+{% for pkg in security_updates_blacklist %}
+    "{{ pkg }}";
+{% endfor %}
+};
+
+// Options de téléchargement
+Unattended-Upgrade::Download-Deb-Pkg "true";
+Unattended-Upgrade::Minimal-Steps "true";
+
+// Nettoyage automatique
+Unattended-Upgrade::Remove-Unused-Dependencies "true";
+Unattended-Upgrade::Automatic-Reboot "false";
+
+// Notifications
+{% if security_updates_email.enabled %}
+Unattended-Upgrade::Mail "{{ security_updates_email.address }}";
+Unattended-Upgrade::MailReport "on-change";
+{% else %}
+Unattended-Upgrade::MailReport "false";
+{% endif %}
+
+// Logs
+Unattended-Upgrade::SyslogEnable "true";
+Unattended-Upgrade::SyslogFacility "daemon";

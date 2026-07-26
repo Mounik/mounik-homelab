@@ -1,0 +1,24 @@
+services:
+  crowdsec:
+    image: crowdsecurity/crowdsec:{{ crowdsec_version }}
+    container_name: crowdsec
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:{{ crowdsec_lapi_port }}:8080"
+      - "{{ crowdsec_appsec_port }}:7422"
+    volumes:
+      - ./data:/var/lib/crowdsec/data
+      - ./etc:/etc/crowdsec
+      - /var/log/auth.log:/var/log/auth.log:ro
+      - /var/log/syslog:/var/log/syslog:ro
+      - /opt/traefik/logs:/var/log/traefik:ro
+    environment:
+      - GID=1000
+      - COLLECTIONS={{ crowdsec_collections | join(' ') }}
+      - CUSTOM_HOSTNAME={{ crowdsec_hostname }}
+    networks:
+      - frontend
+
+networks:
+  frontend:
+    external: true

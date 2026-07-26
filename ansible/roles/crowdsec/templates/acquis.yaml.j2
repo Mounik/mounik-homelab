@@ -1,0 +1,16 @@
+filenames:
+  - /var/log/auth.log
+  - /var/log/syslog
+labels:
+  type: syslog
+---
+filenames:
+  - /var/log/traefik/*.log
+labels:
+  type: traefik
+---
+appsec_config: crowdsecurity/appsec-default
+labels:
+  type: appsec
+listen_addr: 0.0.0.0:{{ crowdsec_appsec_port }}
+source: appsec

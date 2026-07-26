@@ -1,0 +1,67 @@
+#!/usr/sbin/nft -f
+# nftables configuration - mounik-homelab
+# Généré par Ansible - NE PAS MODIFIER MANUELLEMENT
+
+flush ruleset
+
+table inet filter {
+
+    # Liste des IPs admin en whitelist
+    set admin_whitelist {
+        type ipv4_addr
+        flags interval
+        elements = {
+            {% for network in firewall_admin_networks %}
+            {{ network }}{% if not loop.last %},{% endif %}
+
+            {% endfor %}
+        }
+    }
+
+    chain input {
+        type filter hook input priority 0; policy drop;
+
+        # Autoriser le loopback
+        iif lo accept
+
+        # Autoriser les connexions établies
+        ct state established,related accept
+
+        # Dropped les connexions invalides
+        ct state invalid drop
+
+        # ICMP (ping) autorisé
+        ip protocol icmp accept
+
+        # SSH : uniquement depuis les réseaux admin
+        tcp dport 22 ip saddr @admin_whitelist accept
+
+        # HTTP/HTTPS : ouvert (Traefik)
+        tcp dport { 80, 443 } accept
+
+        # Services d'infrastructure : admin uniquement
+        tcp dport { 8080, 9090, 3000 } ip saddr @admin_whitelist accept
+
+        # Prometheus exporter : admin uniquement
+        tcp dport {{ firewall_prometheus_exporter_port }} ip saddr @admin_whitelist accept
+
+        # DNS sortant
+        udp dport 53 accept
+
+        # Log et drop tout le reste
+        limit rate 5/minute log prefix "[NFT-DROP] " level warn
+        drop
+    }
+
+    chain forward {
+        type filter hook forward priority 0; policy drop;
+        # Docker gère sa propre chaîne forward
+        # Autoriser le forwarding pour Docker si nécessaire
+        ct state established,related accept
+    }
+
+    chain output {
+        type filter hook output priority 0; policy accept;
+        # Sortie libre
+    }
+}

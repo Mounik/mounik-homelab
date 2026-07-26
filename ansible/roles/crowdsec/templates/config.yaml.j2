@@ -1,0 +1,12 @@
+---
+# Configuration CrowdSec
+config:
+  log_level: info
+  working_dir: /var/lib/crowdsec/data
+  config_dir: /etc/crowdsec
+  db_config:
+    type: sqlite
+    db_path: /var/lib/crowdsec/data/crowdsec.db
+  prometheus:
+    enabled: true
+    listen: 127.0.0.1:6060

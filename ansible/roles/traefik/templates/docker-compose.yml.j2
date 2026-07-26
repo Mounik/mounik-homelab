@@ -1,0 +1,24 @@
+services:
+  traefik:
+    image: traefik:v3.0
+    container_name: traefik
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /opt/traefik/config:/etc/traefik
+      - /opt/traefik/acme:/acme
+      - /opt/traefik/logs:/logs
+    environment:
+      - CF_DNS_API_KEY=${CF_DNS_API_KEY}
+      - TZ=Europe/Paris
+    labels:
+      - "traefik.enable=true"
+
+      # Dashboard
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.{{ traefik_domain }}`)"
+      - "traefik.http.routers.dashboard.entrypoints=websecure"
+      - "traefik.http.routers.dashboard.tls.certresolver=cloudflare"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.middlewares=crowdsec@file"
+      - "traefik.http.services.dashboard.loadbalancer.server.port=8080"

@@ -1,0 +1,74 @@
+---
+# Role: base - Configuration de base de toutes les VMs
+
+- name: Mettre à jour le cache APT
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Installer les packages de base
+  apt:
+    name:
+      - curl
+      - wget
+      - git
+      - vim
+      - htop
+      - net-tools
+      - apt-transport-https
+      - ca-certificates
+      - gnupg
+      - lsb-release
+      - python3
+      - python3-pip
+      - openssh-server
+      - ufw
+      - rsync
+      - tmux
+      - unzip
+      - jq
+      - tree
+    state: present
+
+- name: Configurer le hostname
+  hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: Ajouter le hostname dans /etc/hosts
+  lineinfile:
+    path: /etc/hosts
+    regexp: "^127\\.0\\.1\\.1"
+    line: "127.0.1.1 {{ inventory_hostname }}"
+
+- name: Configurer SSH sécurisé
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  loop:
+    - { regexp: '^#?PermitRootLogin', line: 'PermitRootLogin prohibit-password' }
+    - { regexp: '^#?PasswordAuthentication', line: 'PasswordAuthentication no' }
+    - { regexp: '^#?X11Forwarding', line: 'X11Forwarding no' }
+    - { regexp: '^#?MaxAuthTries', line: 'MaxAuthTries 3' }
+  notify: restart sshd
+
+- name: Activer le service SSH
+  systemd:
+    name: ssh
+    enabled: yes
+    state: started
+
+- name: Configurer les horaires
+  timezone:
+    name: Europe/Paris
+
+- name: Activer NTP
+  apt:
+    name: chrony
+    state: present
+
+- name: Activer et démarrer chrony
+  systemd:
+    name: chrony
+    enabled: yes
+    state: started

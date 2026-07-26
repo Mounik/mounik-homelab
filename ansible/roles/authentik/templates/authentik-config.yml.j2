@@ -1,0 +1,20 @@
+# =============================================================================
+# Authentik Configuration
+# Généré par Ansible - mounik-homelab
+# =============================================================================
+
+# Logging
+log_level: info
+
+# Éditeur de flows
+flow:
+  enrollment:
+    # Activer l'inscription publique (désactiver en production)
+    allow_enable_unenrollment: false
+    stages:
+      - default-enrollment
+
+# LDAP Provider (optionnel)
+# ldap:
+#   enabled: true
+#   listen: 0.0.0.0:389

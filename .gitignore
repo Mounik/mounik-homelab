@@ -1,0 +1,34 @@
+# OpenTofu / Terraform
+*.tfstate
+*.tfstate.backup
+*.tfplan
+tfplan
+.terraform/
+.terraform.lock.hcl
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+terraform.tfvars
+*.auto.tfvars
+
+# Ansible
+ansible/inventory-generated.yml
+*.retry
+
+# SSH
+*.pem
+*.key
+
+# Screts
+.env
+.env.*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# MkDocs
+site/

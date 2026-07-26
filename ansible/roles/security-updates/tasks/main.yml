@@ -1,0 +1,43 @@
+---
+# Role: security-updates - Mises à jour de sécurité automatisées (Debian)
+
+- name: Installer unattended-upgrades et apt-listchanges
+  apt:
+    name:
+      - unattended-upgrades
+      - apt-listchanges
+      - apt-transport-https
+    state: present
+    update_cache: yes
+
+- name: Configurer les sources de mises à jour
+  copy:
+    dest: /etc/apt/apt.conf.d/20auto-upgrades
+    owner: root
+    group: root
+    mode: '0644'
+    content: |
+      APT::Periodic::Update-Package-Lists "1";
+      APT::Periodic::Unattended-Upgrade "1";
+      APT::Periodic::AutocleanInterval "7";
+
+- name: Configurer unattended-upgrades
+  template:
+    src: 50unattended-upgrades.j2
+    dest: /etc/apt/apt.conf.d/50unattended-upgrades
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart unattended-upgrades
+
+- name: S'assurer que unattended-upgrades est actif
+  systemd:
+    name: unattended-upgrades
+    enabled: yes
+    state: started
+
+- name: Activer le timer apt-daily-upgrade
+  systemd:
+    name: apt-daily-upgrade.timer
+    enabled: yes
+    state: started

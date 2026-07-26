@@ -1,0 +1,31 @@
+---
+# Role: firewall - Installation et configuration de nftables
+
+- name: Installer nftables
+  apt:
+    name:
+      - nftables
+      - nftables-tools
+    state: present
+    update_cache: yes
+
+- name: Activer et démarrer nftables
+  systemd:
+    name: nftables
+    enabled: yes
+    state: started
+
+- name: Déployer la configuration nftables
+  template:
+    src: nftables.conf.j2
+    dest: /etc/nftables.conf
+    owner: root
+    group: root
+    mode: '0640'
+    validate: 'nft -c -f %s'
+  notify: reload nftables
+
+- name: S'assurer que nftables est actif après déploiement
+  systemd:
+    name: nftables
+    state: restarted

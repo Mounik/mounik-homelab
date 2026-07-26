@@ -1,0 +1,80 @@
+# =============================================================================
+# Variables Proxmox - mounik-homelab
+# =============================================================================
+
+# --- Connexion Proxmox ---
+variable "proxmox_endpoint" {
+  description = "URL de l'API Proxmox (ex: https://192.168.1.20:8006)"
+  type        = string
+}
+
+variable "proxmox_username" {
+  description = "Utilisateur Proxmox (ex: root@pam)"
+  type        = string
+  default     = "root@pam"
+}
+
+variable "proxmox_password" {
+  description = "Mot de passe Proxmox"
+  type        = string
+  sensitive   = true
+}
+
+variable "proxmox_insecure" {
+  description = "Ignorer les erreurs SSL (self-signed certs)"
+  type        = bool
+  default     = true
+}
+
+# --- Proxmox Nodes ---
+variable "pve_nodes" {
+  description = "Map des nœuds Proxmox"
+  type = map(object({
+    node_name = string
+    ip_suffix = string
+  }))
+  default = {
+    pve01 = { node_name = "pve01", ip_suffix = "20" }
+    pve02 = { node_name = "pve02", ip_suffix = "21" }
+    pve03 = { node_name = "pve03", ip_suffix = "22" }
+  }
+}
+
+# --- VM Template ---
+variable "template_name" {
+  description = "Nom du template Debian 13 dans Proxmox"
+  type        = string
+  default     = "debian-13-template"
+}
+
+variable "template_vm_id" {
+  description = "ID du template Debian 13"
+  type        = number
+  default     = 9000
+}
+
+# --- Réseau ---
+variable "gateway" {
+  description = "Passerelle par défaut"
+  type        = string
+  default     = "192.168.1.254"
+}
+
+variable "dns_servers" {
+  description = "Serveurs DNS"
+  type        = list(string)
+  default     = ["1.1.1.1", "1.0.0.1"]
+}
+
+# --- Storage ---
+variable "datastore_id" {
+  description = "Datastore Proxmox pour les VMs"
+  type        = string
+  default     = "local-lvm"
+}
+
+variable "iso_datastore_id" {
+  description = "Datastore pour les ISOs"
+  type        = string
+  default     = "local"
+}

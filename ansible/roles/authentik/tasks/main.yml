@@ -1,0 +1,55 @@
+---
+# Role: authentik - IAM complet pour Traefik
+
+- name: Créer les répertoires Authentik
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - /opt/authentik
+    - /opt/authentik/data
+    - /opt/authentik/data/media
+    - /opt/authentik/data/certs
+    - /opt/authentik/data/custom-templates
+    - /opt/authentik/data/geolite
+    - /opt/authentik/postgres
+
+- name: Générer les mots de passe
+  command: openssl rand -base64 32 | tr -dc 'a-zA-Z0-9' | head -c 32
+  register: ak_secret_gen
+  changed_when: false
+
+- name: Générer le mot de passe PostgreSQL
+  command: openssl rand -base64 24 | tr -dc 'a-zA-Z0-9' | head -c 24
+  register: ak_pg_pass_gen
+  changed_when: false
+
+- name: Déployer docker-compose.yml
+  template:
+    src: docker-compose.yml.j2
+    dest: /opt/authentik/docker-compose.yml
+    mode: '0644'
+
+- name: Déployer la configuration Authentik
+  template:
+    src: authentik-config.yml.j2
+    dest: /opt/authentik/data/authentik-config.yml
+    mode: '0644'
+
+- name: Déployer le fichier .env
+  template:
+    src: env.j2
+    dest: /opt/authentik/.env
+    mode: '0600'
+
+- name: Créer le réseau Docker frontend
+  command: docker network create frontend
+  register: network_create
+  changed_when: "'already exists' not in network_create.stderr"
+  failed_when: false
+
+- name: Démarrer Authentik
+  community.docker.docker_compose_v2:
+    project_src: /opt/authentik
+    state: present
