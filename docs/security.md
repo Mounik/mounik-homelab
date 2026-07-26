@@ -1,135 +1,185 @@
-# Sécurité - mounik-homelab
+# Sécurité — Défense en Profondeur
+
+## L'analogie
+
+Imagine que ta maison est un château fort. La sécurité ne repose pas sur un seul mur, mais sur **7 couches de défense** :
+1. Le fossé (Cloudflare)
+2. Le pont-levis (Cloudflare Tunnel)
+3. La herse (Traefik)
+4. Le garde (CrowdSec)
+5. La serrure de la porte (TinyAuth)
+6. Les murs intérieurs (VLANs + nftables)
+7. Le coffre-fort (chiffrement)
+
+Si un ennemi franchit un mur, les suivants l'attendent encore.
+
+---
 
 ## Politique de sécurité
 
-- **Aucun service exposé directement sur Internet** — accès via Cloudflare Tunnel uniquement
-- **Authentification centralisée** — TinyAuth (Phase 1) puis Authentik (Phase 2)
-- **Isolation réseau** — 4 VLANs (Mgmt, Infra, App, IA)
-- **Defense en profondeur** — CrowdSec IDS/IPS + WAF + nftables
-- **Sauvegardes chiffrées** — Proxmox Backup Server + disque dur externe
+**Principe fondamental :** Aucun service n'est exposé directement sur Internet. Tout le trafic passe par un tunnel sécurisé.
 
-## Couches de protection
+| Règle | Explication |
+|-------|-------------|
+| Aucun port ouvert | Le tunnel Cloudflare sort de la box, pas vers l'extérieur |
+| Auth centralisée | Un seul mot de passe pour tous les services |
+| Isolation réseau | Les VLANs séparent les types de trafic |
+| Défense en profondeur | 7 couches de protection superposées |
+| Sauvegardes chiffrées | Les données sont chiffrées et sauvegardées |
+| Mises à jour auto | Les correctifs de sécurité s'installent automatiquement |
 
-### 1. Réseau
+---
 
-#### VLANs
+## Les 7 couches de protection
 
-| VLAN | ID  | Sous-réseau      | Usage                  |
-|------|-----|------------------|------------------------|
-| Mgmt | 10  | 192.168.10.0/24  | Administration         |
-| Infra| 20  | 192.168.20.0/24  | Services critiques     |
-| App  | 30  | 192.168.30.0/24  | Services personnels    |
-| IA   | 40  | 192.168.40.0/24  | Ollama, LangGraph, n8n |
+### Couche 1 — Cloudflare (DDoS + WAF)
 
-#### Firewall (nftables)
+**C'est quoi ?** Cloudflare est un service qui protège mon site contre les attaques massives (DDoS) et les failles de sécurité (WAF = Web Application Firewall).
 
-Chaque VM utilise nftables avec :
-
-- **Policy** : DROP par défaut
-- **Loopback** : toujours autorisé
-- **Connexions établies** : autorisées
-- **SSH** : uniquement depuis les réseaux admin (192.168.1.0/24, 192.168.10.0/24)
-- **HTTP/HTTPS** : ouvert (Traefik)
-- **Services admin** (Grafana, Traefik dashboard) : admin uniquement
-- **Reste** : DROP avec logging
-
-### 2. Accès externe
-
-#### Cloudflare Tunnel
-
-- Aucun port ouvert sur le pare-feu
-- Trafic chiffré TLS terminé au niveau Cloudflare
-- Protection DDoS Cloudflare incluse
-- Under Attack Mode activable
-
-#### DNS
-
-- DNS géré par Cloudflare
-- Enregistrements `*.mounik.ovh` pointant vers le tunnel
-- Proxy activé pour tous les sous-domaines
-
-### 3. Authentification
-
-#### Phase 1 — TinyAuth
-
-Léger et simple pour démarrer :
-
-```
-Utilisateur → Traefik → TinyAuth (ForwardAuth) → Service
-```
-
-- Portail d'auth web
-- Comptes locaux + OAuth (GitHub)
-- ACL basique par application
-- ~50 Mo RAM
-
-#### Phase 2 — Authentik
-
-Migration vers un IAM complet type entreprise :
-
-- SSO (Single Sign-On)
-- OAuth2/OIDC
-- SAML
-- LDAP
-- MFA (TOTP, WebAuthn)
-- Gestion utilisateurs/groupes avancée
-
-### 4. Détection d'intrusion
-
-#### CrowdSec
-
-IDS/IPS collaboratif + WAF applicatif :
-
-```
-Attaquant → Cloudflare Tunnel → Traefik → CrowdSec Bouncer → LAPI → allow/ban
-```
+**Analogie :** C'est le **fossé du château**. Les attaquants doivent d'abord le traverser avant d'atteindre les murs.
 
 **Fonctionnement :**
+```
+Attaquant → Cloudflare (absorbe l'attaque) → Mon serveur
+```
 
-1. Traefik génère des logs d'accès (JSON)
+**Pourquoi c'est important ?**
+- Les attaques DDoS envoient des millions de requêtes pour faire tomber le serveur
+- Cloudflare absorbe tout ça et ne laisse passer que le trafic légitime
+- C'est comme un pare-brise qui filtre les débris
+
+---
+
+### Couche 2 — Cloudflare Tunnel (zéro port ouvert)
+
+**C'est quoi ?** Un tunnel chiffré qui sort de mon serveur vers Cloudflare. Aucun port n'est ouvert sur ma box Internet.
+
+**Analogie :** C'est un **passage souterrain secret** entre le château et l'extérieur. Personne ne peut entrer par la porte principale parce qu'elle n'existe pas.
+
+**Fonctionnement :**
+```
+Mon serveur ──► Cloudflare ──► Internet
+       (sortant)     (entrant)
+```
+
+**Pourquoi c'est mieux qu'un port ouvert ?**
+- Si j'ouvre un port (ex: 443), n'importe qui peut essayer de se connecter
+- Avec un tunnel sortant, c'est **moi** qui établis la connexion
+- Résultat : mon serveur est **invisible** sur Internet
+
+---
+
+### Couche 3 — Traefik (reverse proxy)
+
+**C'est quoi ?** Traefik est un "guichet d'accueil" qui reçoit toutes les requêtes web et les redirige vers le bon service.
+
+**Analogie :** C'est le **portier du château**. Il vérifie l'identité de chaque visiteur et l'envoie dans la bonne direction.
+
+**Fonctionnement :**
+```
+Utilisateur → Traefik →识别 le sous-domaine → Bon service
+```
+
+**Pourquoi c'est nécessaire ?**
+- J'ai 17 services, chacun avec son sous-domaine
+- Traefik gère automatiquement les certificats SSL/TLS
+- Il empêche les attaques de type "header injection"
+
+---
+
+### Couche 4 — CrowdSec (IDS/IPS collaboratif)
+
+**C'est quoi ?** CrowdSec est un système de détection d'intrusion qui analyse les logs de Traefik et bannit automatiquement les IPs suspectes.
+
+**Analogie :** C'est le **garde du château** qui surveille les mouvements suspects. Si quelqu'un essaie de forcer la porte, il est banni.
+
+**Fonctionnement :**
+```
+1. Traefik génère des logs (qui a visité quoi)
 2. CrowdSec analyse ces logs en temps réel
-3. Le plugin bouncer dans Traefik interroge CrowdSec LAPI
-4. Si une IP est bannie → 403 Forbidden
-5. Le bouncer firewall bannit l'IP au niveau réseau
+3. Si une IP est suspecte → elle est bannie
+4. Le bouncer firewall l'bloque aussi au niveau réseau
+```
 
 **Collections actives :**
 
-| Collection | Rôle |
-|-----------|------|
-| `crowdsecurity/traefik` | Attaques spécifiques Traefik |
-| `crowdsecurity/http-cve` | Détection de CVE HTTP |
-| `crowdsecurity/base-http-scenarios` | Scénarios d'attaque HTTP de base |
-| `crowdsecurity/sshd` | Protection brute force SSH |
-| `crowdsecurity/linux` | Protection système Linux |
-| `crowdsecurity/appsec-generic-rules` | WAF règles génériques |
+| Collection | Ce qu'elle détecte |
+|-----------|-------------------|
+| `crowdsecurity/traefik` | Attaques spécifiques à Traefik |
+| `crowdsecurity/http-cve` | Failles de sécurité connues |
+| `crowdsecurity/base-http-scenarios` | Attaques HTTP de base |
+| `crowdsecurity/sshd` | Tentatives de brute force SSH |
+| `crowdsecurity/linux` | Attaques système Linux |
+| `crowdsecurity/appsec-generic-rules` | Règles WAF génériques |
 | `crowdsecurity/appsec-virtual-patching` | Protection vulnérabilités connues |
 | `crowdsecurity/appsec-crs` | OWASP Core Rule Set |
 
-### 5. Scan de vulnérabilités
+---
 
-#### Trivy + Harbor
+### Couche 5 — TinyAuth (authentification centralisée)
 
-Scan automatique des images Docker via Harbor :
+**C'est quoi ?** TinyAuth est un service d'authentification qui te demande de t'identifier avant d'accéder à n'importe quel service.
 
-- CVEs connues
-- Secrets exposés
-- Configurations incorrectes
-- Intégré au pipeline CI/CD GitLab
-- Scan automatique à chaque push d'image
+**Analogie :** C'est la **serrure de la porte d'entrée**. Tu dois présenter ta carte d'identité avant d'entrer.
 
-#### Wazuh
+**Fonctionnement :**
+```
+Utilisateur → Traefik → TinyAuth (ForwardAuth) → Service
+                              │
+                              ▼
+                         Login / OAuth
+                              │
+                              ▼
+                         Autorisé? → non → 403 Forbidden
+                              │
+                              oui
+                              ▼
+                         Service cible
+```
 
-SIEM (Security Information and Event Management) :
+**Phase 1 — TinyAuth (actuel) :**
+- Léger (~50 Mo de RAM)
+- Comptes locaux + OAuth (GitHub)
+- ACL basique par application
 
-- Logs d'audit système
-- Détection d'intrusion
-- Conformité (PCI DSS, GDPR)
-- Corrélation d'événements
-- Agents sur toutes les VMs
+**Phase 2 — Authentik (futur) :**
+- IAM complet type entreprise
+- SSO, OAuth2/OIDC, SAML, LDAP
+- MFA (TOTP, WebAuthn)
+- Gestion utilisateurs/groupes avancée
 
-### 6. Kubernetes Security
+---
 
-#### Network Policies
+### Couche 6 — VLANs + nftables (isolation réseau)
+
+**C'est quoi ?** Les VLANs créent des réseaux virtuels séparés, et nftables est le firewall local de chaque VM.
+
+**Analogie :** Ce sont les **murs intérieurs du château**. Même si quelqu'un entre dans le salon, il ne peut pas accéder à la chambre sans autorisation.
+
+**Règles nftables :**
+- **Policy DROP** : tout est bloqué par défaut
+- **SSH admin uniquement** : seuls les réseaux autorisés peuvent se connecter
+- **HTTP/HTTPS ouvert** : pour Traefik
+- **Tout le reste** : bloqué avec logging
+
+---
+
+### Couche 7 — Chiffrement + sauvegardes
+
+**C'est quoi ?** Tes données sont chiffrées (AES-256) et sauvegardées sur un disque externe.
+
+**Analogie :** C'est le **coffre-fort du château**. Même si quelqu'un vole le coffre, il ne peut pas l'ouvrir.
+
+**Règle 3-2-1 :**
+- **3** copies des données
+- **2** supports différents (NVMe + disque externe)
+- **1** copie externe (disque dur physique à domicile)
+
+---
+
+## Kubernetes Security
+
+### Network Policies
 
 Isolation des pods au sein du cluster :
 
@@ -145,80 +195,110 @@ spec:
     - Egress
 ```
 
-#### RBAC
+**Analogie :** Chaque application dans Kubernetes est dans sa propre **bulle de savon**. Elle ne peut communiquer qu'avec les services explicitement autorisés.
+
+### RBAC (Role-Based Access Control)
 
 Contrôle d'accès basé sur les rôles :
+- **GitLab** : accès aux projets
+- **ArgoCD** : accès aux déploiements
+- **Harbor** : accès aux registres
 
-- GitLab : accès aux projets
-- ArgoCD : accès aux déploiements
-- Harbor : accès aux registres
-
-#### Secrets Management
+### Secrets Management
 
 - Secrets Kubernetes chiffrés
 - Vaultwarden pour les secrets externes
 - Variables d'environnement sensibles via Sealed Secrets
 
-### 7. Mises à jour
+---
 
-#### unattended-upgrades
+## Scan de vulnérabilités
 
-Mises à jour de sécurité automatiques sur Debian :
+### Trivy + Harbor
 
-- Correctifs de sécurité critiques
+Scan automatique des images Docker via Harbor :
+- CVEs connues (failles de sécurité publiées)
+- Secrets exposés (clés API, mots de passe)
+- Configurations incorrectes
+- Intégré au pipeline CI/CD GitLab
+- Scan automatique à chaque push d'image
+
+### Wazuh (SIEM)
+
+SIEM = Security Information and Event Management. C'est un système qui :
+- Collecte les logs de toutes les VMs
+- Détecte les intrusions
+- Vérifie la conformité (PCI DSS, GDPR)
+- Corréle les événements suspects
+
+---
+
+## Mises à jour de sécurité
+
+### unattended-upgrades
+
+Sur Debian, les mises à jour de sécurité critiques s'installent automatiquement :
+- Correctifs de sécurité
 - Installation automatique
 - Redémarrage planifié si nécessaire
 
-## Conception de sécurité
+---
 
-### Défense en profondeur
+## Vue d'ensemble de la défense en profondeur
 
 ```
 Internet
     ↓
-Cloudflare (DDoS + WAF)
+Cloudflare (DDoS + WAF) ← Couche 1
     ↓
-Cloudflare Tunnel (TLS)
+Cloudflare Tunnel (TLS) ← Couche 2
     ↓
-Traefik (reverse proxy + CrowdSec bouncer)
+Traefik (reverse proxy) ← Couche 3
     ↓
-TinyAuth / Authentik (authentification)
+CrowdSec (IDS/IPS) ← Couche 4
     ↓
-nftables (firewall VM)
+TinyAuth (authentification) ← Couche 5
+    ↓
+nftables (firewall VM) ← Couche 6
     ↓
 Application
     ↓
-Stockage (chiffré)
+Stockage (chiffré) ← Couche 7
 ```
 
-### Isolation des services
+---
 
-**Docker (pve01) :**
+## Isolation des services
+
+### Docker (pve01)
 
 Chaque service tourne dans son conteneur Docker avec :
-
 - Réseau Docker isolé
-- Pas de privileges excessifs
+- Pas de privilèges excessifs
 - Variables d'environnement pour les secrets
 - Volumes montés en lecture seule quand possible
 
-**Kubernetes (pve02+pve03) :**
+### Kubernetes (pve02+pve03)
 
 - Namespaces par application
 - Network Policies entre les namespaces
-- Resource Quotas
+- Resource Quotas (limite de ressources)
 - Pod Security Policies
+
+---
 
 ## Compétences démontrées
 
 Pour les entretiens DevOps/DevSecOps :
 
-- **Cloudflare Tunnel** : zero-trust networking
-- **CrowdSec** : IDS/IPS collaboratif
-- **nftables** : firewall stateful
-- **TinyAuth/Authentik** : IAM et SSO
-- **Trivy + Harbor** : scan d'images et registry sécurisé
-- **Wazuh** : SIEM et conformité
-- **Kubernetes** : Network Policies, RBAC, Secrets
-- **VLANs** : segmentation réseau
-- **Chiffrement** : données au repos et en transit
+| Compétence | Démonstration |
+|-----------|---------------|
+| Cloudflare Tunnel | Zero-trust networking |
+| CrowdSec | IDS/IPS collaboratif |
+| nftables | Firewall stateful |
+| TinyAuth/Authentik | IAM et SSO |
+| Trivy + Harbor | Scan d'images et registry sécurisé |
+| Wazuh | SIEM et conformité |
+| Kubernetes | Network Policies, RBAC, Secrets |
+| VLANs | Segmentation réseau |
+| Chiffrement | Données au repos et en transit |

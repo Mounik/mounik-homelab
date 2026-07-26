@@ -72,7 +72,10 @@ nav:
   - Architecture:
       - architecture.md
       - Réseau: network.md
+  - Services: services.md
   - Sécurité:
       - security.md
   - Operations:
       - disaster-recovery.md
+  - Référence:
+      - glossary.md

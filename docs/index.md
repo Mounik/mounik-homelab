@@ -16,10 +16,12 @@ Plateforme personnelle auto-hébergée — un environnement cloud domestique pen
 
 ## Documentation
 
-- [Architecture](architecture.md) — Vue d'ensemble du cluster et des services
-- [Réseau](network.md) — VLANs, plan IP, sous-domaines
-- [Sécurité](security.md) — CrowdSec, authentification, firewall
+- [Architecture](architecture.md) — Vue d'ensemble du cluster et des choix techniques
+- [Réseau](network.md) — VLANs, plan IP, sous-domaines, firewall
+- [Services](services.md) — Guide complet de chaque service
+- [Sécurité](security.md) — Les 7 couches de protection
 - [Disaster Recovery](disaster-recovery.md) — Sauvegardes et restauration
+- [Glossaire](glossary.md) — Termes techniques expliqués
 
 ## Architecture rapide
 
@@ -28,11 +30,11 @@ Internet → Cloudflare Tunnel → Traefik → TinyAuth → Services
                                                  → CrowdSec (IDS/IPS)
 ```
 
-| Nœud  | Rôle | RAM | VMs |
-|-------|------|-----|-----|
-| pve01 | Infrastructure Core | 16 Go | Traefik, Monitoring, Auth, Vaultwarden |
-| pve02 | Personal Cloud | 32 Go | Paperless, Immich, Nextcloud, Mealie |
-| pve03 | AI & DevOps Lab | 32 Go | Ollama, OpenWebUI, Gitea, Wazuh |
+| Nœud  | Rôle | RAM | Services |
+|-------|------|-----|----------|
+| pve01 | Infrastructure Core | 16 Go | Traefik, Monitoring, Vaultwarden |
+| pve02 | Personal Cloud + k3s | 32 Go | GitLab, ArgoCD, Paperless, Immich |
+| pve03 | AI + k3s | 32 Go | Ollama, OpenWebUI, JobSync, Wazuh |
 
 ## Déploiement
 
@@ -54,8 +56,12 @@ Internet → Cloudflare Tunnel → Traefik → TinyAuth → Services
 | IaC | OpenTofu |
 | Configuration | Ansible |
 | Conteneurs | Docker |
+| Kubernetes | k3s + Longhorn + MetalLB |
 | Reverse Proxy | Traefik v3 |
 | Auth | TinyAuth → Authentik |
 | IDS/IPS | CrowdSec |
+| GitOps | ArgoCD |
+| CI/CD | GitLab CI |
+| Registry | Harbor |
 | Monitoring | Prometheus + Grafana |
-| IA | Ollama + OpenWebUI |
+| IA | Ollama + OpenWebUI + LangGraph |
