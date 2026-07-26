@@ -6,9 +6,9 @@ Le Mounik Personal Cloud Platform est un **cluster de 3 ordinateurs** (appelés 
 
 ### L'analogie
 
-Imagine un restaurant avec 3 cuisiniers :
-- **pve01** — Le chef qui gère la sécurité et les commandes (Traefik, CrowdSec, monitoring)
-- **pve02** — Le cuisinier principal qui prépare les plats quotidiens (photos, documents, cloud)
+Imagine un restaurant avec 3 cuisiniers :  
+- **pve01** — Le chef qui gère la sécurité et les commandes (Traefik, CrowdSec, monitoring)  
+- **pve02** — Le cuisinier principal qui prépare les plats quotidiens (photos, documents, cloud)  
 - **pve03** — Le chef pâtissier spécialisé en desserts complexes (IA, automatisation)
 
 Chaque cuisinier a son rôle, mais ils collaborent pour servir les clients (toi).
@@ -36,10 +36,10 @@ Chaque cuisinier a son rôle, mais ils collaborent pour servir les clients (toi)
 
 **Proxmox VE** est un hyperviseur open source (gratuit) qui permet de créer des machines virtuelles (VMs) sur du matériel physique. C'est l'équivalent de VMware ESXi mais gratuit et mieux adapté à un homelab.
 
-**Choix technique :** Proxmox est choisi pour :
-- Son interface web intuitive
-- Son support de clustering (plusieurs serveurs qui collaborent)
-- Sa communauté active et sa documentation
+**Choix technique :** Proxmox est choisi pour :  
+- Son interface web intuitive  
+- Son support de clustering (plusieurs serveurs qui collaborent)  
+- Sa communauté active et sa documentation  
 - Son coût (gratuit vs VMware qui coûte cher)
 
 ---
@@ -97,9 +97,9 @@ C'est le **serveur d'intelligence artificielle**. Il héberge les modèles d'IA 
 
 ### Pourquoi k3s ?
 
-k3s est une version **allégée** de Kubernetes, parfaite pour un homelab :
-- Moins gourmand en ressources (500 Mo de RAM vs 2 Go pour K8s classique)
-- Plus simple à installer et à maintenir
+k3s est une version **allégée** de Kubernetes, parfaite pour un homelab :  
+- Moins gourmand en ressources (500 Mo de RAM vs 2 Go pour K8s classique)  
+- Plus simple à installer et à maintenir  
 - Parfait pour 2-3 nœuds (pas besoin de 100 nœuds comme Google)
 
 ### Le cluster
@@ -133,8 +133,8 @@ k3s est une version **allégée** de Kubernetes, parfaite pour un homelab :
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**Server vs Agent :**
-- **Server** (k3s-node01) : le "cerveau" qui gère le cluster
+**Server vs Agent :**  
+- **Server** (k3s-node01) : le "cerveau" qui gère le cluster  
 - **Agent** (k3s-node02) : le "travailleur" qui exécute les tâches
 
 ### Applications Kubernetes
@@ -170,7 +170,7 @@ Developer → Git Push → GitLab CI → Build Image → Harbor
 
 1. **Tu écris du code** → tu le pousses sur GitLab
 2. **GitLab CI** compile et teste ton code automatiquement
-3. **Harbor** stocke l'image Docker resulting
+3. **Harbor** stocke l'image Docker
 4. **ArgoCD** détecte le changement et déploie sur Kubernetes
 5. **Le service est mis à jour** sans intervention manuelle
 
@@ -214,8 +214,8 @@ Ansible (configuration système + k3s + services)
 | Cas d'usage | Apps simples, pve01 | Apps critiques, cluster |
 | Maintenance | Facile | Plus complexe |
 
-**Pourquoi les deux ?**
-- **Docker Compose** pour les services simples sur pve01 (Traefik, Vaultwarden)
+**Pourquoi les deux ?**  
+- **Docker Compose** pour les services simples sur pve01 (Traefik, Vaultwarden)  
 - **Kubernetes** pour les services critiques sur pve02+pve03 (GitLab, ArgoCD, Harbor)
 
 ### Stack technique complète
@@ -315,11 +315,11 @@ ansible-playbook -i inventory.yml playbook.yml --tags argocd
 
 ### Monitoring
 
-Prometheus collecte les métriques de :
-- **Proxmox** — état des VMs, CPU, RAM, disque
-- **VMs** — node_exporter (métriques système)
-- **Containers** — cAdvisor (métriques Docker)
-- **k3s** — metrics-server (métriques Kubernetes)
+Prometheus collecte les métriques de :  
+- **Proxmox** — état des VMs, CPU, RAM, disque  
+- **VMs** — node_exporter (métriques système)  
+- **Containers** — cAdvisor (métriques Docker)  
+- **k3s** — metrics-server (métriques Kubernetes)  
 - **Applications** — GitLab, ArgoCD, Harbor (endpoints custom)
 
 Grafana affiche les dashboards. Alertmanager envoie les alertes sur Discord/Email.

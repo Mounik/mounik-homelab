@@ -287,18 +287,18 @@ Chaque service tourne dans son conteneur Docker avec :
 
 ---
 
-## Compétences démontrées
+## Pourquoi ce choix de sécurité ?
 
-Pour les entretiens DevOps/DevSecOps :
+En milieu professionnel, la sécurité suit le principe de **défense en profondeur** : on ne fait pas confiance à un seul outil, on empile les couches de protection. C'est exactement ce que je fais ici :
 
-| Compétence | Démonstration |
-|-----------|---------------|
-| Cloudflare Tunnel | Zero-trust networking |
-| CrowdSec | IDS/IPS collaboratif |
-| nftables | Firewall stateful |
-| TinyAuth/Authentik | IAM et SSO |
-| Trivy + Harbor | Scan d'images et registry sécurisé |
-| Wazuh | SIEM et conformité |
-| Kubernetes | Network Policies, RBAC, Secrets |
-| VLANs | Segmentation réseau |
-| Chiffrement | Données au repos et en transit |
+| Choix | Raison professionnelle |
+|-------|----------------------|
+| Cloudflare Tunnel | Les entreprises utilisent des tunnels sortants pour éviter d'ouvrir des ports |
+| CrowdSec | Les IDS/IPS collaboratifs sont utilisés dans les SOC (Security Operations Center) |
+| nftables | C'est le firewall standard de Linux en entreprise |
+| TinyAuth/Authentik | L'IAM (Identity and Access Management) est un must en entreprise |
+| Trivy + Harbor | Le scan d'images est obligatoire dans les pipelines CI/CD d'entreprise |
+| Wazuh | Les SIEM sont utilisés dans les SOC pour la conformité (PCI DSS, GDPR) |
+| Kubernetes Security | Network Policies, RBAC et Secrets sont les standards K8s en production |
+| VLANs | La segmentation réseau est obligatoire dans les datacenters |
+| Chiffrement | AES-256 est le standard de chiffrement utilisé par les banques et gouvernements |

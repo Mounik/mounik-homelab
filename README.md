@@ -302,27 +302,29 @@ Disque dur externe (chiffré, à la maison)
 
 ---
 
-## Stack technique (pour les développeurs)
+## Stack technique — pourquoi ces choix ?
+
+En milieu professionnel, on choisit les outils selon leur fiabilité, leur communauté, et leur écosystème. Voici la logique derrière chaque choix :
 
 ### Infrastructure
 
-| Composant | Technologie | Version | Justification |
-|-----------|-------------|---------|---------------|
-| Hyperviseur | Proxmox VE | 8.x | Open source, léger, bien documenté |
-| OS VMs | Debian 13 | — | Stabilité, support à long terme |
-| IaC | OpenTofu | 1.8+ | Fork open source de Terraform |
-| Config Management | Ansible | 2.17+ | Agentless, simple, puissant |
+| Composant | Technologie | Version | Pourquoi ce choix ? |
+|-----------|-------------|---------|---------------------|
+| Hyperviseur | Proxmox VE | 8.x | Open source, léger, bien documenté, gratuit |
+| OS VMs | Debian 13 | — | Stabilité, support à long terme, pas de surprises |
+| IaC | OpenTofu | 1.8+ | Fork open source de Terraform, pas de license fees |
+| Config Management | Ansible | 2.17+ | Agentless (pas d'agent à installer), simple, puissant |
 
 ### Kubernetes
 
-| Composant | Technologie | Version | Justification |
-|-----------|-------------|---------|---------------|
-| Distribution | k3s | v1.31.4 | Léger, parfait pour homelab |
-| Storage | Longhorn | v1.7.x | Storage distribué, snapshots |
-| LoadBalancer | MetalLB | v0.14.x | Expose les services K8s |
-| GitOps | ArgoCD | v2.12.x | Déploiement continu, rollback facile |
-| CI/CD | GitLab CI | 17.x | Intégration native avec GitLab CE |
-| Registry | Harbor | v2.15.x | Scan de sécurité des images |
+| Composant | Technologie | Version | Pourquoi ce choix ? |
+|-----------|-------------|---------|---------------------|
+| Distribution | k3s | v1.31.4 | Léger, parfait pour 2-3 nœuds, pas 100 |
+| Storage | Longhorn | v1.7.x | Stockage distribué, snapshots automatiques |
+| LoadBalancer | MetalLB | v0.14.x | Donne des IPs aux services K8s (sinon inaccessibles) |
+| GitOps | ArgoCD | v2.12.x | Déploiement continu, rollback en 1 clic |
+| CI/CD | GitLab CI | 17.x | Intégration native avec GitLab CE, pas de configexterne |
+| Registry | Harbor | v2.15.x | Scan de sécurité intégré (Trivy), registry privé |
 
 ### Sécurité
 

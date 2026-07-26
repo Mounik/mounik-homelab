@@ -6,10 +6,10 @@ Le réseau du homelab est organisé en **VLANs** (Virtual Local Area Networks) �
 
 ### L'analogie
 
-Imagine un immeuble de bureaux :
-- **Étage 1 (VLAN 10)** — La salle serveur (management)
-- **Étage 2 (VLAN 20)** — Le local technique (infrastructure critique)
-- **Étage 3 (VLAN 30)** — Les bureaux (services personnels)
+Imagine un immeuble de bureaux :  
+- **Étage 1 (VLAN 10)** — La salle serveur (management)  
+- **Étage 2 (VLAN 20)** — Le local technique   (infrastructure critique)  
+- **Étage 3 (VLAN 30)** — Les bureaux (services personnels)  
 - **Étage 4 (VLAN 40)** — Le laboratoire R&D (intelligence artificielle)
 
 Chaque étage a sa propre serrure. Pour passer d'un étage à l'autre, il faut une autorisation explicite.
@@ -199,15 +199,15 @@ C'est la **règle d'or de la sécurité réseau**. Si tu ouvres un port sur ta b
 
 ---
 
-## Compétences démontrées
+## Pourquoi ce choix réseau ?
 
-Pour les entretiens DevOps/DevSecOps, ce réseau démontre :
+En milieu professionnel, les entreprises utilisent des VLANs pour isoler les réseaux. C'est la norme dans les datacenters et les grandes entreprises. J'applique la même logique ici :
 
-| Compétence | Démonstration |
-|-----------|---------------|
-| VLANs | Isolation réseau, segmentation |
-| nftables | Firewall stateful, rules management |
-| DNS | Cloudflare, sous-domaines, tunnel |
-| Reverse proxy | Traefik, routing HTTP |
-| Zero-trust | Aucun port ouvert, tunnel sortant |
-| Sécurité | Defense en profondeur, logs |
+| Choix | Raison professionnelle |
+|-------|----------------------|
+| VLANs | En entreprise, on sépare le réseau admin, production, et development |
+| nftables | C'est le firewall standard de Linux, utilisé partout en production |
+| DNS Cloudflare | Les entreprises utilisent des reverse DNS pour la sécurité et le cache |
+| Reverse proxy | Traefik est utilisé dans les environnements Docker/Kubernetes en entreprise |
+| Zero-trust | Le modèle zero-trust (aucun port ouvert) est la tendance actuelle en sécurité |
+| Logs | En entreprise, on log tout pour pouvoir investiguer en cas d'incident |
