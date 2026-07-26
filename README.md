@@ -6,6 +6,8 @@
 ![Infrastructure](https://img.shields.io/badge/IaC-OpenTofu-blue)
 ![Automation](https://img.shields.io/badge/Automation-Ansible-black)
 ![Containers](https://img.shields.io/badge/Containers-Docker-blue)
+![Kubernetes](https://img.shields.io/badge/Kubernetes-k3s-blue)
+![GitOps](https://img.shields.io/badge/GitOps-ArgoCD-orange)
 
 > Plateforme personnelle auto-hébergée basée sur un cluster Proxmox.
 >
@@ -69,25 +71,33 @@ Le homelab doit être utile quotidiennement, documenté, sécurisé, reproductib
 ## Architecture globale
 
 ```
-                        INTERNET
-                            |
-                   Cloudflare Tunnel
-                            |
-                         Traefik
-                            |
-                     TinyAuth (auth)
-                     CrowdSec (IDS/IPS)
-                            |
-            +---------------+---------------+
-            |               |               |
-       Applications        IA          DevSecOps
-            |               |               |
-      Paperless-ngx    OpenWebUI          Git
-      Immich           Ollama         CI/CD
-      Vaultwarden      Qdrant         Security
-      Mealie           LangGraph      Monitoring
-      Nextcloud        n8n
-      Obsidian (2nd Brain)
+                         INTERNET
+                             │
+                    Cloudflare Tunnel
+                             │
+                          Traefik
+                             │
+                      TinyAuth (auth)
+                      CrowdSec (IDS/IPS)
+                             │
+           ┌─────────────────┼─────────────────┐
+           │                 │                 │
+    ┌──────┴──────┐   ┌──────┴──────┐   ┌──────┴──────┐
+    │   pve01     │   │   pve02     │   │   pve03     │
+    │  (16 Go)    │   │  (32 Go)    │   │  (32 Go)    │
+    │  Docker     │   │  k3s Node1  │   │  k3s Node2  │
+    │             │   │  + Docker   │   │  + Docker   │
+    ├─────────────┤   ├─────────────┤   ├─────────────┤
+    │ Traefik     │   │ GitLab CE   │   │ Ollama      │
+    │ Monitoring  │   │ ArgoCD      │   │ OpenWebUI   │
+    │ Vaultwarden │   │ Harbor      │   │ Qdrant      │
+    │ Cloudflare  │   │ Paperless   │   │ LangGraph   │
+    │             │   │ Immich      │   │             │
+    └─────────────┘   └─────────────┘   └─────────────┘
+           │                 │                 │
+           └─────────────────┴─────────────────┘
+                             │
+                    Cluster k3s (64 Go)
 ```
 
 ---
@@ -106,11 +116,11 @@ Le homelab doit être utile quotidiennement, documenté, sécurisé, reproductib
 
 ## Organisation des nœuds
 
-### pve01 - Infrastructure Core
+### pve01 - Infrastructure Core (Docker)
 
 > Services critiques de la plateforme
 
-- Traefik
+- Traefik (reverse proxy)
 - Cloudflare Tunnel
 - TinyAuth (auth centralisée)
 - CrowdSec (IDS/IPS)
@@ -119,32 +129,36 @@ Le homelab doit être utile quotidiennement, documenté, sécurisé, reproductib
 - Grafana
 - Loki
 - Alertmanager
-- Uptime Kuma
 
-### pve02 - Personal Cloud
+### pve02 - Cloud + k3s Node 01
 
-> Services utilisés au quotidien
+> Cluster Kubernetes + services personnels
 
+**Kubernetes (24 Go RAM) :**
+- GitLab CE (CI/CD)
+- ArgoCD (GitOps)
+- Harbor (Registry)
+- Longhorn (Storage)
+- MetalLB (LoadBalancer)
+
+**Docker (8 Go RAM) :**
 - Paperless-ngx
 - Immich
-- Nextcloud
-- Mealie
-- Actual Budget
-- Home Assistant
-- Plex
 
-### pve03 - AI & DevOps Lab
+### pve03 - AI + k3s Node 02
 
-> Expérimentation, développement et automatisation
+> Cluster Kubernetes + services IA
 
-- OpenWebUI
+**Kubernetes (24 Go RAM) :**
+- k3s Agent Node
+- Monitoring stack
+
+**Docker (8 Go RAM) :**
 - Ollama
+- OpenWebUI
 - Qdrant
 - LangGraph
 - n8n
-- Git
-- CI/CD
-- Security Tools
 
 ---
 
@@ -159,17 +173,41 @@ Le homelab doit être utile quotidiennement, documenté, sécurisé, reproductib
 ### Infrastructure as Code
 
 ```
-OpenTofu          -> Création VM/LXC
-    |
-Ansible           -> Configuration système
-    |
-Docker Compose    -> Applications
+OpenTofu          -> Création VMs sur Proxmox
+    │
+Ansible           -> Configuration système + k3s
+    │
+┌───┴───┐
+│       │
+Docker  Kubernetes
+```
+
+### Kubernetes
+
+| Composant | Technologie | Version |
+|-----------|-------------|---------|
+| Distribution | k3s | v1.31.4 |
+| Storage | Longhorn | v1.7.x |
+| LoadBalancer | MetalLB | v0.14.x |
+| Ingress | Traefik (k3s built-in) | v3.x |
+| GitOps | ArgoCD | v2.12.x |
+| CI/CD | GitLab CI | 17.x |
+| Registry | Harbor | v2.15.x |
+
+### GitOps
+
+```
+Developer → Git Push → GitLab CI → Build Image → Harbor
+                                    │
+                                    ▼
+                              ArgoCD Sync → k3s → Service
 ```
 
 ### Système
 
 - Debian 13
 - Docker & Docker Compose
+- Kubernetes (k3s)
 - Bash
 - Python
 
@@ -442,11 +480,11 @@ Tous les services sont accessibles via des sous-domaines de `mounik.ovh` :
 | `mealie.mounik.ovh`        | Mealie           | Recettes                       |
 | `actual.mounik.ovh`        | Actual Budget    | Gestion financière             |
 | `nextcloud.mounik.ovh`     | Nextcloud        | Cloud personnel                |
-| `obsidian.mounik.ovh`      | Obsidian (web)   | Second cerveau / notes         |
 | `traefik.mounik.ovh`       | Traefik          | Dashboard reverse proxy        |
 | `grafana.mounik.ovh`       | Grafana          | Monitoring                     |
-| `gitea.mounik.ovh`         | Gitea            | Forge logicielle               |
-| `harbor.mounik.ovh`        | Harbor           | Registry Docker                |
+| `gitlab.mounik.ovh`        | GitLab CE        | Forge logicielle + CI/CD       |
+| `argocd.mounik.ovh`        | ArgoCD           | GitOps & déploiement continu   |
+| `harbor.mounik.ovh`        | Harbor           | Registry Docker + scan sécurité|
 | `ollama.mounik.ovh`        | Ollama           | API IA (cloud models)          |
 | `openwebui.mounik.ovh`     | OpenWebUI        | Interface IA                   |
 | `n8n.mounik.ovh`           | n8n              | Automatisation                 |
@@ -463,17 +501,16 @@ Tous les services sont accessibles via des sous-domaines de `mounik.ovh` :
 | Mealie           | Recettes                       | `mealie.mounik.ovh`           |
 | Actual Budget    | Gestion financière             | `actual.mounik.ovh`           |
 | Nextcloud        | Cloud personnel                | `nextcloud.mounik.ovh`        |
-| Obsidian         | Second cerveau / notes         | `obsidian.mounik.ovh`         |
 
 ### Services techniques
 
-| Service         | Usage                      | Sous-domaine                 |
-|-----------------|----------------------------|------------------------------|
-| Gitea           | Forge logicielle           | `gitea.mounik.ovh`           |
-| Harbor          | Registry Docker            | `harbor.mounik.ovh`          |
-| DefectDojo      | Gestion vulnérabilités     | —                            |
-| Trivy           | Scan sécurité              | — (CLI)                      |
-| Wazuh           | SIEM & sécurité            | `wazuh.mounik.ovh`           |
+| Service         | Usage                      | Sous-domaine                 | Type      |
+|-----------------|----------------------------|------------------------------|-----------|
+| GitLab CE       | Forge logicielle + CI/CD   | `gitlab.mounik.ovh`          | Kubernetes|
+| ArgoCD          | GitOps & déploiement       | `argocd.mounik.ovh`          | Kubernetes|
+| Harbor          | Registry Docker + scan     | `harbor.mounik.ovh`          | Kubernetes|
+| Trivy           | Scan sécurité images       | — (CLI)                      | CLI       |
+| Wazuh           | SIEM & sécurité            | `wazuh.mounik.ovh`           | Kubernetes|
 
 ---
 
@@ -522,7 +559,11 @@ mounik-homelab/
 │       ├── traefik/            # Traefik v3
 │       ├── crowdsec/           # CrowdSec IDS/IPS + WAF
 │       ├── tinyauth/           # Auth centralisée (Phase 1)
-│       └── authentik/          # IAM complet (Phase 2)
+│       ├── authentik/          # IAM complet (Phase 2)
+│       ├── k3s/                # Cluster Kubernetes
+│       ├── gitlab-ce/          # GitLab CE (CI/CD)
+│       ├── argocd/             # ArgoCD (GitOps)
+│       └── harbor/             # Harbor (Registry)
 └── diagrams/
 ```
 
@@ -540,7 +581,7 @@ curl -fsSL https://get.opentofu.org/install.sh | sh
 pip install ansible
 
 # Installer les collections Ansible
-ansible-galaxy collection install community.docker community.general
+ansible-galaxy collection install community.docker community.general kubernetes.core
 ```
 
 ### Déploiement complet
@@ -574,6 +615,29 @@ cp terraform/terraform.tfvars.example terraform/terraform.tfvars
 
 # Détruire toutes les VMs
 ./scripts/deploy.sh destroy
+
+# --- Commandes Kubernetes ---
+
+# Déployer uniquement le cluster k3s
+ansible-playbook -i inventory.yml playbook.yml --tags k3s
+
+# Déployer GitLab CE
+ansible-playbook -i inventory.yml playbook.yml --tags gitlab
+
+# Déployer ArgoCD
+ansible-playbook -i inventory.yml playbook.yml --tags argocd
+
+# Déployer Harbor
+ansible-playbook -i inventory.yml playbook.yml --tags harbor
+
+# Voir les pods Kubernetes
+kubectl get pods -A
+
+# Voir les services
+kubectl get svc -A
+
+# Voir les deployments
+kubectl get deployments -A
 ```
 
 ### SSH
@@ -635,12 +699,18 @@ ssh-copy-id -i ~/.ssh/mounik-homelab.pub root@192.168.1.22
 
 ### Phase 5 - DevSecOps
 
-- [ ] GitLab/Gitea
-- [ ] CI/CD
-- [ ] Trivy
-- [ ] DefectDojo
-- [ ] Wazuh
-- [ ] Security Dashboard
+- [x] GitLab CE (remplace Gitea)
+- [x] ArgoCD (GitOps)
+- [x] Harbor (Registry)
+- [ ] Trivy (scan sécurité)
+- [ ] Wazuh (SIEM)
+
+### Phase 6 - Kubernetes
+
+- [x] k3s cluster (2 nœuds)
+- [x] Longhorn (storage distribué)
+- [x] MetalLB (LoadBalancer)
+- [ ] Cert-Manager (TLS automatique)
 
 ---
 
@@ -661,8 +731,11 @@ En cas de perte complète :
 
 ## Documentation associée
 
-- Documentation utilisateur : [https://mounik.ovh](https://mounik.ovh)
-- Documentation technique : `/docs`
+- [Architecture](docs/architecture.md) — Vue d'ensemble du cluster et des services
+- [Réseau](docs/network.md) — VLANs, plan IP, sous-domaines
+- [Sécurité](docs/security.md) — CrowdSec, authentification, firewall
+- [Disaster Recovery](docs/disaster-recovery.md) — Sauvegardes et restauration
+- Documentation MkDocs : `mkdocs serve` → http://localhost:8000
 
 ---
 

@@ -1,0 +1,87 @@
+---
+# Role: argocd - Installation d'ArgoCD sur Kubernetes
+
+- name: Créer l'namespace ArgoCD
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: argocd
+
+- name: Ajouter le repo Helm ArgoCD
+  kubernetes.core.helm_repository:
+    name: argo
+    repo_url: "https://argoproj.github.io/argo-helm"
+
+- name: Déployer ArgoCD via Helm
+  kubernetes.core.helm:
+    name: argocd
+    namespace: argocd
+    chart_ref: argo/argo-cd
+    chart_version: "7.3.11"
+    values:
+      global:
+        image:
+          tag: "v2.12.4"
+      server:
+        replicas: 1
+        service:
+          type: LoadBalancer
+        config:
+          url: "https://argocd.mounik.ovh"
+          admin.enabled: "true"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            memory: 512Mi
+      controller:
+        replicas: 1
+        resources:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+          limits:
+            memory: 1Gi
+      repoServer:
+        replicas: 1
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            memory: 512Mi
+      applicationSet:
+        enabled: true
+      notifications:
+        enabled: false
+
+- name: Attendre qu'ArgoCD soit prêt
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: Deployment
+    name: argocd-server
+    namespace: argocd
+  register: argocd_deployment
+  until: >
+    argocd_deployment.resources | length > 0 and
+    argocd_deployment.resources[0].status.ready_replicas is defined and
+    argocd_deployment.resources[0].status.ready_replicas > 0
+  retries: 30
+  delay: 10
+
+- name: Récupérer le mot de passe admin ArgoCD
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Secret
+    name: argocd-initial-admin-secret
+    namespace: argocd
+  register: argocd_password
+
+- name: Afficher le mot de passe admin ArgoCD
+  debug:
+    msg: "Mot de passe admin ArgoCD: {{ argocd_password.resources[0].data.password | b64decode }}"
+  when: argocd_password.resources | length > 0

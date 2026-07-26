@@ -15,7 +15,9 @@
 | Configuration VMs | Proxmox Backup Server | Hebdomadaire | 30 jours |
 | Données applicatives | restic → disque dur externe | Quotidienne | 90 jours |
 | Configuration OpenTofu | Git | Push | Illimitée |
+| Manifests Kubernetes | Git (GitLab) | Push | Illimitée |
 | Secrets | Vaultwarden | Réplication intégrée | Illimitée |
+| PVs Kubernetes | Longhorn snapshots | Quotidienne | 30 jours |
 
 ## Composants
 
@@ -107,6 +109,33 @@ ansible-playbook -i inventory.yml playbook.yml --tags traefik
 
 # 2. Ou un rôle spécifique
 ansible-playbook -i inventory.yml playbook.yml --tags crowdsec
+
+# 3. Redéployer le cluster k3s
+ansible-playbook -i inventory.yml playbook.yml --tags k3s
+
+# 4. Redéployer GitLab
+ansible-playbook -i inventory.yml playbook.yml --tags gitlab
+
+# 5. Redéployer ArgoCD
+ansible-playbook -i inventory.yml playbook.yml --tags argocd
+```
+
+### Cluster Kubernetes
+
+```bash
+# 1. Vérifier l'état du cluster
+kubectl get nodes
+kubectl get pods -A
+
+# 2. Restaurer un namespace
+kubectl delete namespace <namespace>
+kubectl apply -f <manifests>
+
+# 3. Restaurer depuis ArgoCD
+argocd app sync <app-name>
+
+# 4. Restaurer des PVs Longhorn
+kubectl get volumes -n longhorn-system
 ```
 
 ## Scénarios de reprise
@@ -122,8 +151,17 @@ ansible-playbook -i inventory.yml playbook.yml --tags crowdsec
 
 1. Recréer les VMs avec OpenTofu (`./scripts/deploy.sh apply`)
 2. Cloud-init installe Docker
-3. Ansible configure les services
-4. Restaurer les données depuis restic
+3. Ansible configure les services et le cluster k3s
+4. ArgoCD restore les applications Kubernetes
+5. Restaurer les données depuis restic
+
+### Perte d'un nœud k3s
+
+1. Le cluster continue de fonctionner (haute disponibilité)
+2. Les pods sont reschedulés sur l'autre nœud
+3. Restaurer la VM depuis PBS
+4. Réinstaller k3s agent : `ansible-playbook -i inventory.yml playbook.yml --tags k3s`
+5. Le nœud rejoint automatiquement le cluster
 
 ### Perte du disque externe
 

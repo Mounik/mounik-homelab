@@ -1,0 +1,10 @@
+---
+# Role: k3s - Defaults
+
+k3s_version: "v1.31.4+k3s1"
+k3s_token: "CHANGE_ME"
+k3s_server_ip: "192.168.20.200"
+k3s_role: "server"  # server ou agent
+
+# MetalLB
+metallb_ip_range: "192.168.20.220-192.168.20.250"

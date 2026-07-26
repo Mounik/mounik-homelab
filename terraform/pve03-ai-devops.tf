@@ -1,5 +1,5 @@
 # =============================================================================
-# VMs pve03 - AI & DevOps Lab - mounik-homelab
+# VMs pve03 - AI & DevOps Lab - k3s Cluster - mounik-homelab
 # =============================================================================
 
 variable "pve03_node" {
@@ -7,13 +7,39 @@ variable "pve03_node" {
   default = "pve03"
 }
 
-# --- VMs IA ---
+# --- k3s Node 02 (server/agent) ---
+# Deuxième nœud du cluster Kubernetes
+
+module "k3s_node02" {
+  source = "./modules/vm"
+
+  vm_name        = "k3s-node02"
+  vm_id          = 300
+  node_name      = var.pve03_node
+  template_name  = var.template_name
+  cpu_cores      = 4
+  memory_mb      = 24576  # 24 Go pour K8s
+  disk_gb        = 100
+  ip_address     = "192.168.20.210"
+  gateway        = var.gateway
+  ssh_public_key = var.ssh_public_key
+  datastore_id   = var.datastore_id
+  tags           = "k8s;wazuh;n8n"
+  description    = "k3s Node 02 - Wazuh, n8n, monitoring"
+
+  disks = [
+    { size = "100", datastore_id = var.datastore_id }
+  ]
+}
+
+# --- VMs IA (restent en Docker) ---
+# Ollama a besoin d'accès direct aux ressources
 
 module "ollama" {
   source = "./modules/vm"
 
   vm_name        = "ollama"
-  vm_id          = 300
+  vm_id          = 310
   node_name      = var.pve03_node
   template_name  = var.template_name
   cpu_cores      = 4
@@ -31,7 +57,7 @@ module "openwebui" {
   source = "./modules/vm"
 
   vm_name        = "open-webui"
-  vm_id          = 301
+  vm_id          = 311
   node_name      = var.pve03_node
   template_name  = var.template_name
   cpu_cores      = 2
@@ -49,7 +75,7 @@ module "qdrant" {
   source = "./modules/vm"
 
   vm_name        = "qdrant"
-  vm_id          = 302
+  vm_id          = 312
   node_name      = var.pve03_node
   template_name  = var.template_name
   cpu_cores      = 2
@@ -67,7 +93,7 @@ module "langgraph" {
   source = "./modules/vm"
 
   vm_name        = "langgraph"
-  vm_id          = 303
+  vm_id          = 313
   node_name      = var.pve03_node
   template_name  = var.template_name
   cpu_cores      = 2
@@ -85,7 +111,7 @@ module "n8n" {
   source = "./modules/vm"
 
   vm_name        = "n8n"
-  vm_id          = 304
+  vm_id          = 314
   node_name      = var.pve03_node
   template_name  = var.template_name
   cpu_cores      = 2
@@ -97,64 +123,4 @@ module "n8n" {
   datastore_id   = var.datastore_id
   tags           = "ai;automation"
   description    = "n8n - Automatisation"
-}
-
-# --- VMs DevSecOps ---
-
-module "gitea" {
-  source = "./modules/vm"
-
-  vm_name        = "gitea"
-  vm_id          = 310
-  node_name      = var.pve03_node
-  template_name  = var.template_name
-  cpu_cores      = 2
-  memory_mb      = 2048
-  disk_gb        = 30
-  ip_address     = "192.168.20.200"
-  gateway        = var.gateway
-  ssh_public_key = var.ssh_public_key
-  datastore_id   = var.datastore_id
-  tags           = "devops;git"
-  description    = "Gitea - Forge logicielle"
-}
-
-module "harbor" {
-  source = "./modules/vm"
-
-  vm_name        = "harbor"
-  vm_id          = 311
-  node_name      = var.pve03_node
-  template_name  = var.template_name
-  cpu_cores      = 2
-  memory_mb      = 4096
-  disk_gb        = 50
-  ip_address     = "192.168.20.201"
-  gateway        = var.gateway
-  ssh_public_key = var.ssh_public_key
-  datastore_id   = var.datastore_id
-  tags           = "devops;registry"
-  description    = "Harbor - Registry Docker"
-
-  disks = [
-    { size = "50", datastore_id = var.datastore_id }
-  ]
-}
-
-module "wazuh" {
-  source = "./modules/vm"
-
-  vm_name        = "wazuh"
-  vm_id          = 312
-  node_name      = var.pve03_node
-  template_name  = var.template_name
-  cpu_cores      = 2
-  memory_mb      = 4096
-  disk_gb        = 50
-  ip_address     = "192.168.20.202"
-  gateway        = var.gateway
-  ssh_public_key = var.ssh_public_key
-  datastore_id   = var.datastore_id
-  tags           = "devops;security;siem"
-  description    = "Wazuh - SIEM & sécurité"
 }

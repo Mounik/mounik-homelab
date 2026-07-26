@@ -78,3 +78,33 @@ variable "iso_datastore_id" {
   type        = string
   default     = "local"
 }
+
+# --- k3s Cluster ---
+variable "k3s_version" {
+  description = "Version de k3s"
+  type        = string
+  default     = "v1.31.4+k3s1"
+}
+
+variable "k3s_token" {
+  description = "Token secret pour le cluster k3s"
+  type        = string
+  sensitive   = true
+}
+
+variable "k3s_server_ip" {
+  description = "IP du premier nœud k3s (server)"
+  type        = string
+  default     = "192.168.20.200"
+}
+
+variable "k3s_additionalSANs" {
+  description = "SANs supplémentaires pour l'API server"
+  type        = list(string)
+  default     = ["k3s.mounik.ovh"]
+}
+
+variable "ssh_public_key" {
+  description = "Clé publique SSH"
+  type        = string
+}

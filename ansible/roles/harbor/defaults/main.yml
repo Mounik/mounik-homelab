@@ -1,0 +1,7 @@
+---
+# Role: harbor - Defaults
+
+harbor_version: "1.15.1"
+harbor_domain: "mounik.ovh"
+harbor_subdomain: "harbor"
+harbor_admin_password: "CHANGE_ME"

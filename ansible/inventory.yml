@@ -3,6 +3,7 @@
 
 all:
   children:
+    # --- Nœuds Proxmox ---
     proxmox:
       hosts:
         pve01:
@@ -10,19 +11,96 @@ all:
           ansible_user: root
           ansible_python_interpreter: /usr/bin/python3
           pve_role: infrastructure
-          pve_ip_suffix: "20"
         pve02:
           ansible_host: 192.168.1.21
           ansible_user: root
           ansible_python_interpreter: /usr/bin/python3
           pve_role: personal-cloud
-          pve_ip_suffix: "21"
         pve03:
           ansible_host: 192.168.1.22
           ansible_user: root
           ansible_python_interpreter: /usr/bin/python3
           pve_role: ai-devops
-          pve_ip_suffix: "22"
+
+    # --- VMs Infrastructure (pve01 - Docker) ---
+    infrastructure:
+      hosts:
+        traefik:
+          ansible_host: 192.168.20.100
+          ansible_user: admin
+          role: traefik
+        monitoring:
+          ansible_host: 192.168.20.101
+          ansible_user: admin
+          role: monitoring
+        vaultwarden:
+          ansible_host: 192.168.20.103
+          ansible_user: admin
+          role: vaultwarden
+
+    # --- Cluster k3s ---
+    k3s_server:
+      hosts:
+        k3s-node01:
+          ansible_host: 192.168.20.200
+          ansible_user: admin
+          k3s_role: server
+
+    k3s_agents:
+      hosts:
+        k3s-node02:
+          ansible_host: 192.168.20.210
+          ansible_user: admin
+          k3s_role: agent
+
+    k3s:
+      children:
+        k3s_server:
+        k3s_agents:
+
+    # --- VMs Apps Docker (pve02) ---
+    personal-cloud:
+      hosts:
+        paperless:
+          ansible_host: 192.168.30.100
+          ansible_user: admin
+        immich:
+          ansible_host: 192.168.30.101
+          ansible_user: admin
+        nextcloud:
+          ansible_host: 192.168.30.102
+          ansible_user: admin
+        mealie:
+          ansible_host: 192.168.30.103
+          ansible_user: admin
+        actual-budget:
+          ansible_host: 192.168.30.104
+          ansible_user: admin
+        home-assistant:
+          ansible_host: 192.168.30.105
+          ansible_user: admin
+        plex:
+          ansible_host: 192.168.30.106
+          ansible_user: admin
+
+    # --- VMs IA Docker (pve03) ---
+    ai:
+      hosts:
+        ollama:
+          ansible_host: 192.168.40.100
+          ansible_user: admin
+        open-webui:
+          ansible_host: 192.168.40.101
+          ansible_user: admin
+        qdrant:
+          ansible_host: 192.168.40.102
+          ansible_user: admin
+        langgraph:
+          ansible_host: 192.168.40.103
+          ansible_user: admin
+        n8n:
+          ansible_host: 192.168.40.104
+          ansible_user: admin
 
   vars:
     ansible_ssh_common_args: '-o StrictHostKeyChecking=no'

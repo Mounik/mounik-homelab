@@ -1,0 +1,6 @@
+---
+# Role: argocd - Defaults
+
+argocd_version: "7.3.11"
+argocd_domain: "mounik.ovh"
+argocd_subdomain: "argocd"

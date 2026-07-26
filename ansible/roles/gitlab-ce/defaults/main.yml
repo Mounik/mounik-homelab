@@ -1,0 +1,6 @@
+---
+# Role: gitlab-ce - Defaults
+
+gitlab_version: "7.6.0"
+gitlab_domain: "mounik.ovh"
+gitlab_subdomain: "gitlab"

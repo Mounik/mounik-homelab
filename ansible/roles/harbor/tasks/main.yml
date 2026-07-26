@@ -1,0 +1,107 @@
+---
+# Role: harbor - Installation d'Harbor sur Kubernetes
+
+- name: Créer l'namespace Harbor
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: harbor
+
+- name: Ajouter le repo Helm Harbor
+  kubernetes.core.helm_repository:
+    name: harbor
+    repo_url: "https://helm.goharbor.io"
+
+- name: Déployer Harbor via Helm
+  kubernetes.core.helm:
+    name: harbor
+    namespace: harbor
+    chart_ref: harbor/harbor
+    chart_version: "1.15.1"
+    values:
+      expose:
+        type: loadBalancer
+        tls:
+          enabled: false
+        loadBalancer:
+          IP: "{{ metallb_ip_range | split('-') | first }}"
+      externalURL: "https://harbor.mounik.ovh"
+      persistence:
+        enabled: true
+        persistentVolumeClaim:
+          registry:
+            storageClass: "longhorn"
+            size: 50Gi
+          database:
+            storageClass: "longhorn"
+            size: 5Gi
+          redis:
+            storageClass: "longhorn"
+            size: 5Gi
+          jobservice:
+            jobLog:
+              storageClass: "longhorn"
+              size: 5Gi
+      harborAdminPassword: "{{ harbor_admin_password }}"
+      database:
+        type: internal
+      redis:
+        type: internal
+      registry:
+        replicas: 1
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            memory: 512Mi
+      core:
+        replicas: 1
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            memory: 512Mi
+      portal:
+        replicas: 1
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            memory: 256Mi
+      jobservice:
+        replicas: 1
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            memory: 512Mi
+      trivy:
+        enabled: true
+        replicas: 1
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            memory: 512Mi
+
+- name: Attendre qu'Harbor soit prêt
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: Deployment
+    name: harbor-core
+    namespace: harbor
+  register: harbor_deployment
+  until: >
+    harbor_deployment.resources | length > 0 and
+    harbor_deployment.resources[0].status.ready_replicas is defined and
+    harbor_deployment.resources[0].status.ready_replicas > 0
+  retries: 60
+  delay: 30

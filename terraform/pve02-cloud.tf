@@ -1,5 +1,5 @@
 # =============================================================================
-# VMs pve02 - Personal Cloud - mounik-homelab
+# VMs pve02 - Personal Cloud + k3s Node - mounik-homelab
 # =============================================================================
 
 variable "pve02_node" {
@@ -7,13 +7,40 @@ variable "pve02_node" {
   default = "pve02"
 }
 
-# --- VMs Services Personnels ---
+# --- k3s Node 01 (server/agent) ---
+# VM principale pour le cluster Kubernetes
+# 24 Go RAM dédiée au cluster (restant pour apps Docker)
+
+module "k3s_node01" {
+  source = "./modules/vm"
+
+  vm_name        = "k3s-node01"
+  vm_id          = 200
+  node_name      = var.pve02_node
+  template_name  = var.template_name
+  cpu_cores      = 4
+  memory_mb      = 24576  # 24 Go pour K8s
+  disk_gb        = 100
+  ip_address     = "192.168.20.200"
+  gateway        = var.gateway
+  ssh_public_key = var.ssh_public_key
+  datastore_id   = var.datastore_id
+  tags           = "k8s;gitlab;argocd;harbor"
+  description    = "k3s Node 01 - GitLab CE, ArgoCD, Harbor"
+
+  disks = [
+    { size = "100", datastore_id = var.datastore_id }
+  ]
+}
+
+# --- Apps Docker restantes sur pve02 ---
+# Services qui restent en Docker Compose (pas dans K8s)
 
 module "paperless" {
   source = "./modules/vm"
 
   vm_name        = "paperless"
-  vm_id          = 200
+  vm_id          = 210
   node_name      = var.pve02_node
   template_name  = var.template_name
   cpu_cores      = 2
@@ -31,7 +58,7 @@ module "immich" {
   source = "./modules/vm"
 
   vm_name        = "immich"
-  vm_id          = 201
+  vm_id          = 211
   node_name      = var.pve02_node
   template_name  = var.template_name
   cpu_cores      = 4
@@ -49,7 +76,7 @@ module "nextcloud" {
   source = "./modules/vm"
 
   vm_name        = "nextcloud"
-  vm_id          = 202
+  vm_id          = 212
   node_name      = var.pve02_node
   template_name  = var.template_name
   cpu_cores      = 2
@@ -61,17 +88,13 @@ module "nextcloud" {
   datastore_id   = var.datastore_id
   tags           = "app;cloud"
   description    = "Nextcloud - Cloud personnel"
-
-  disks = [
-    { size = "100", datastore_id = var.datastore_id }
-  ]
 }
 
 module "mealie" {
   source = "./modules/vm"
 
   vm_name        = "mealie"
-  vm_id          = 203
+  vm_id          = 213
   node_name      = var.pve02_node
   template_name  = var.template_name
   cpu_cores      = 1
@@ -89,7 +112,7 @@ module "actual_budget" {
   source = "./modules/vm"
 
   vm_name        = "actual-budget"
-  vm_id          = 204
+  vm_id          = 214
   node_name      = var.pve02_node
   template_name  = var.template_name
   cpu_cores      = 1
@@ -107,7 +130,7 @@ module "home_assistant" {
   source = "./modules/vm"
 
   vm_name        = "home-assistant"
-  vm_id          = 205
+  vm_id          = 215
   node_name      = var.pve02_node
   template_name  = var.template_name
   cpu_cores      = 2
@@ -125,7 +148,7 @@ module "plex" {
   source = "./modules/vm"
 
   vm_name        = "plex"
-  vm_id          = 206
+  vm_id          = 216
   node_name      = var.pve02_node
   template_name  = var.template_name
   cpu_cores      = 2

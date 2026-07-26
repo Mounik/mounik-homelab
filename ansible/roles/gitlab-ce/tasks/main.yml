@@ -1,0 +1,110 @@
+---
+# Role: gitlab-ce - Installation de GitLab CE sur Kubernetes
+
+- name: Créer l'namespace GitLab
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: gitlab
+
+- name: Ajouter le repo Helm GitLab
+  kubernetes.core.helm_repository:
+    name: gitlab
+    repo_url: "https://charts.gitlab.io"
+
+- name: Déployer GitLab CE via Helm
+  kubernetes.core.helm:
+    name: gitlab
+    namespace: gitlab
+    chart_ref: gitlab/gitlab
+    chart_version: "7.6.0"
+    values:
+      global:
+        hosts:
+          domain: mounik.ovh
+          https: true
+          externalIP: "{{ metallb_ip_range | split('-') | first }}"
+        ingress:
+          configureCertmanager: false
+          class: traefik
+        kas:
+          enabled: false
+        pages:
+          enabled: false
+      certmanager:
+        install: false
+      nginx-ingress:
+        enabled: false
+      registry:
+        enabled: true
+        hpa:
+          minReplicas: 1
+          maxReplicas: 1
+      gitlab-runner:
+        install: false
+      prometheus:
+        install: false
+      gitlab:
+        webservice:
+          minReplicas: 1
+          maxReplicas: 1
+          resources:
+            requests:
+              cpu: 300m
+              memory: 1536Mi
+            limits:
+              memory: 3584Mi
+        sidekiq:
+          minReplicas: 1
+          maxReplicas: 1
+          resources:
+            requests:
+              cpu: 200m
+              memory: 1024Mi
+            limits:
+              memory: 2048Mi
+        toolbox:
+          resources:
+            requests:
+              cpu: 50m
+              memory: 350Mi
+            limits:
+              memory: 600Mi
+      gitlab-runner:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            memory: 256Mi
+    timeout: 600s
+
+- name: Attendre que GitLab soit prêt
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: Deployment
+    name: gitlab-webservice-default
+    namespace: gitlab
+  register: gitlab_deployment
+  until: >
+    gitlab_deployment.resources | length > 0 and
+    gitlab_deployment.resources[0].status.ready_replicas is defined and
+    gitlab_deployment.resources[0].status.ready_replicas > 0
+  retries: 60
+  delay: 30
+
+- name: Récupérer le mot de passe root GitLab
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Secret
+    name: gitlab-gitlab-initial-root-password
+    namespace: gitlab
+  register: gitlab_password
+
+- name: Afficher le mot de passe root GitLab
+  debug:
+    msg: "Mot de passe root GitLab: {{ gitlab_password.resources[0].data.password | b64decode }}"
+  when: gitlab_password.resources | length > 0

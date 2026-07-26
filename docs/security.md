@@ -107,14 +107,15 @@ Attaquant → Cloudflare Tunnel → Traefik → CrowdSec Bouncer → LAPI → al
 
 ### 5. Scan de vulnérabilités
 
-#### Trivy
+#### Trivy + Harbor
 
-Scan automatique des images Docker :
+Scan automatique des images Docker via Harbor :
 
 - CVEs connues
 - Secrets exposés
 - Configurations incorrectes
-- Intégré au pipeline CI/CD
+- Intégré au pipeline CI/CD GitLab
+- Scan automatique à chaque push d'image
 
 #### Wazuh
 
@@ -124,8 +125,41 @@ SIEM (Security Information and Event Management) :
 - Détection d'intrusion
 - Conformité (PCI DSS, GDPR)
 - Corrélation d'événements
+- Agents sur toutes les VMs
 
-### 6. Mises à jour
+### 6. Kubernetes Security
+
+#### Network Policies
+
+Isolation des pods au sein du cluster :
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+```
+
+#### RBAC
+
+Contrôle d'accès basé sur les rôles :
+
+- GitLab : accès aux projets
+- ArgoCD : accès aux déploiements
+- Harbor : accès aux registres
+
+#### Secrets Management
+
+- Secrets Kubernetes chiffrés
+- Vaultwarden pour les secrets externes
+- Variables d'environnement sensibles via Sealed Secrets
+
+### 7. Mises à jour
 
 #### unattended-upgrades
 
@@ -159,12 +193,21 @@ Stockage (chiffré)
 
 ### Isolation des services
 
+**Docker (pve01) :**
+
 Chaque service tourne dans son conteneur Docker avec :
 
 - Réseau Docker isolé
 - Pas de privileges excessifs
 - Variables d'environnement pour les secrets
 - Volumes montés en lecture seule quand possible
+
+**Kubernetes (pve02+pve03) :**
+
+- Namespaces par application
+- Network Policies entre les namespaces
+- Resource Quotas
+- Pod Security Policies
 
 ## Compétences démontrées
 
@@ -174,7 +217,8 @@ Pour les entretiens DevOps/DevSecOps :
 - **CrowdSec** : IDS/IPS collaboratif
 - **nftables** : firewall stateful
 - **TinyAuth/Authentik** : IAM et SSO
-- **Trivy** : shift-left security
+- **Trivy + Harbor** : scan d'images et registry sécurisé
 - **Wazuh** : SIEM et conformité
+- **Kubernetes** : Network Policies, RBAC, Secrets
 - **VLANs** : segmentation réseau
 - **Chiffrement** : données au repos et en transit

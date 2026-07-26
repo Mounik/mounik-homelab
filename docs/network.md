@@ -40,12 +40,13 @@ Switch
 | pve03 | 192.168.1.22     | 192.168.10.22   | 192.168.20.22   |
 
 ### VMs (exemple)
-| VM       | IP               | VLAN   | Nœud  |
-|----------|------------------|--------|-------|
-| traefik  | 192.168.20.100   | 20     | pve01 |
-| grafana  | 192.168.20.101   | 20     | pve01 |
-| nextcloud| 192.168.30.100   | 30     | pve02 |
-| ollama   | 192.168.40.100   | 40     | pve03 |
+| VM            | IP               | VLAN | Nœud  |
+|---------------|------------------|------|-------|
+| traefik       | 192.168.20.100   | 20   | pve01 |
+| grafana       | 192.168.20.101   | 20   | pve01 |
+| k3s-node01    | 192.168.20.200   | 20   | pve02 |
+| k3s-node02    | 192.168.20.210   | 20   | pve03 |
+| ollama        | 192.168.40.100   | 40   | pve03 |
 
 ## Firewall (nftables)
 
@@ -74,21 +75,21 @@ Chaque VM utilise nftables avec les règles suivantes :
 | Sous-domaine               | IP destination      | VLAN | Port |
 |----------------------------|---------------------|------|------|
 | `tinyauth.mounik.ovh`      | 192.168.20.100      | 20   | 443  |
-| `vaultwarden.mounik.ovh`   | 192.168.20.100      | 20   | 443  |
+| `vaultwarden.mounik.ovh`   | 192.168.20.103      | 20   | 443  |
 | `paperless.mounik.ovh`     | 192.168.30.100      | 30   | 443  |
 | `immich.mounik.ovh`        | 192.168.30.101      | 30   | 443  |
 | `nextcloud.mounik.ovh`     | 192.168.30.102      | 30   | 443  |
 | `mealie.mounik.ovh`        | 192.168.30.103      | 30   | 443  |
 | `actual.mounik.ovh`        | 192.168.30.104      | 30   | 443  |
-| `obsidian.mounik.ovh`      | 192.168.30.105      | 30   | 443  |
 | `grafana.mounik.ovh`       | 192.168.20.101      | 20   | 443  |
 | `traefik.mounik.ovh`       | 192.168.20.100      | 20   | 443  |
-| `gitea.mounik.ovh`         | 192.168.20.102      | 20   | 443  |
-| `harbor.mounik.ovh`        | 192.168.20.103      | 20   | 443  |
-| `wazuh.mounik.ovh`         | 192.168.20.104      | 20   | 443  |
+| `gitlab.mounik.ovh`        | 192.168.20.200      | 20   | 443  |
+| `argocd.mounik.ovh`        | 192.168.20.200      | 20   | 443  |
+| `harbor.mounik.ovh`        | 192.168.20.200      | 20   | 443  |
+| `wazuh.mounik.ovh`         | 192.168.20.210      | 20   | 443  |
 | `ollama.mounik.ovh`        | 192.168.40.100      | 40   | 443  |
 | `openwebui.mounik.ovh`     | 192.168.40.101      | 40   | 443  |
-| `n8n.mounik.ovh`           | 192.168.40.102      | 40   | 443  |
+| `n8n.mounik.ovh`           | 192.168.40.104      | 40   | 443  |
 
 ## Flux réseau
 
