@@ -90,22 +90,22 @@ module "nextcloud" {
   description    = "Nextcloud - Cloud personnel"
 }
 
-module "mealie" {
+module "twenty_crm" {
   source = "./modules/vm"
 
-  vm_name        = "mealie"
+  vm_name        = "twenty-crm"
   vm_id          = 213
   node_name      = var.pve02_node
   template_name  = var.template_name
-  cpu_cores      = 1
-  memory_mb      = 1024
-  disk_gb        = 10
+  cpu_cores      = 2
+  memory_mb      = 4096
+  disk_gb        = 30
   ip_address     = "192.168.30.103"
   gateway        = var.gateway
   ssh_public_key = var.ssh_public_key
   datastore_id   = var.datastore_id
-  tags           = "app;recipes"
-  description    = "Mealie - Recettes"
+  tags           = "app;crm;career"
+  description    = "Twenty CRM - Gestion contacts & candidatures"
 }
 
 module "actual_budget" {

@@ -1,0 +1,39 @@
+---
+# Role: twenty-crm - Installation de Twenty CRM
+
+- name: Créer le répertoire d'installation
+  file:
+    path: /opt/twenty-crm
+    state: directory
+    mode: '0755'
+
+- name: Déployer docker-compose.yml
+  template:
+    src: docker-compose.yml.j2
+    dest: /opt/twenty-crm/docker-compose.yml
+    mode: '0644'
+  notify: restart twenty-crm
+
+- name: Déployer le fichier .env
+  template:
+    src: env.j2
+    dest: /opt/twenty-crm/.env
+    mode: '0600'
+  notify: restart twenty-crm
+
+- name: Démarrer Twenty CRM
+  community.docker.docker_compose:
+    project_src: /opt/twenty-crm
+    state: present
+  register: twenty_compose
+
+- name: Attendre que PostgreSQL soit prêt
+  uri:
+    url: "http://localhost:{{ twenty_port }}/healthz"
+    method: GET
+    status_code: 200
+  register: health_check
+  until: health_check.status == 200
+  retries: 60
+  delay: 10
+  ignore_errors: yes

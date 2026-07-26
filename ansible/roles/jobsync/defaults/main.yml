@@ -1,0 +1,10 @@
+---
+# Role: jobsync - Defaults
+
+jobsync_version: "latest"
+jobsync_port: "3001"
+jobsync_jwt_secret: "CHANGE_ME_TO_RANDOM_STRING"
+
+# AI Provider (optional)
+jobsync_ai_provider: ""  # openai, anthropic, mistral
+jobsync_ai_key: ""

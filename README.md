@@ -477,7 +477,7 @@ Tous les services sont accessibles via des sous-domaines de `mounik.ovh` :
 | `vaultwarden.mounik.ovh`   | Vaultwarden      | Gestionnaire de mots de passe  |
 | `paperless.mounik.ovh`     | Paperless-ngx    | Documents administratifs       |
 | `immich.mounik.ovh`        | Immich           | Photos personnelles            |
-| `mealie.mounik.ovh`        | Mealie           | Recettes                       |
+| `twenty.mounik.ovh`        | Twenty CRM       | Contacts & candidatures        |
 | `actual.mounik.ovh`        | Actual Budget    | Gestion financière             |
 | `nextcloud.mounik.ovh`     | Nextcloud        | Cloud personnel                |
 | `traefik.mounik.ovh`       | Traefik          | Dashboard reverse proxy        |
@@ -487,6 +487,7 @@ Tous les services sont accessibles via des sous-domaines de `mounik.ovh` :
 | `harbor.mounik.ovh`        | Harbor           | Registry Docker + scan sécurité|
 | `ollama.mounik.ovh`        | Ollama           | API IA (cloud models)          |
 | `openwebui.mounik.ovh`     | OpenWebUI        | Interface IA                   |
+| `jobsync.mounik.ovh`       | JobSync          | Tracker candidatures + IA      |
 | `n8n.mounik.ovh`           | n8n              | Automatisation                 |
 | `wazuh.mounik.ovh`         | Wazuh            | SIEM & sécurité                |
 
@@ -498,7 +499,7 @@ Tous les services sont accessibles via des sous-domaines de `mounik.ovh` :
 | Vaultwarden      | Gestionnaire de mots de passe  | `vaultwarden.mounik.ovh`      |
 | Paperless-ngx    | Documents administratifs       | `paperless.mounik.ovh`        |
 | Immich           | Photos personnelles            | `immich.mounik.ovh`           |
-| Mealie           | Recettes                       | `mealie.mounik.ovh`           |
+| Twenty CRM       | Contacts & candidatures        | `twenty.mounik.ovh`           |
 | Actual Budget    | Gestion financière             | `actual.mounik.ovh`           |
 | Nextcloud        | Cloud personnel                | `nextcloud.mounik.ovh`        |
 
@@ -511,6 +512,7 @@ Tous les services sont accessibles via des sous-domaines de `mounik.ovh` :
 | Harbor          | Registry Docker + scan     | `harbor.mounik.ovh`          | Kubernetes|
 | Trivy           | Scan sécurité images       | — (CLI)                      | CLI       |
 | Wazuh           | SIEM & sécurité            | `wazuh.mounik.ovh`           | Kubernetes|
+| JobSync         | Tracker candidatures + IA  | `jobsync.mounik.ovh`         | Docker    |
 
 ---
 

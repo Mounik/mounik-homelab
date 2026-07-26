@@ -79,13 +79,14 @@ Chaque VM utilise nftables avec les règles suivantes :
 | `paperless.mounik.ovh`     | 192.168.30.100      | 30   | 443  |
 | `immich.mounik.ovh`        | 192.168.30.101      | 30   | 443  |
 | `nextcloud.mounik.ovh`     | 192.168.30.102      | 30   | 443  |
-| `mealie.mounik.ovh`        | 192.168.30.103      | 30   | 443  |
+| `twenty.mounik.ovh`        | 192.168.30.103      | 30   | 443  |
 | `actual.mounik.ovh`        | 192.168.30.104      | 30   | 443  |
 | `grafana.mounik.ovh`       | 192.168.20.101      | 20   | 443  |
 | `traefik.mounik.ovh`       | 192.168.20.100      | 20   | 443  |
 | `gitlab.mounik.ovh`        | 192.168.20.200      | 20   | 443  |
 | `argocd.mounik.ovh`        | 192.168.20.200      | 20   | 443  |
 | `harbor.mounik.ovh`        | 192.168.20.200      | 20   | 443  |
+| `jobsync.mounik.ovh`       | 192.168.40.105      | 40   | 443  |
 | `wazuh.mounik.ovh`         | 192.168.20.210      | 20   | 443  |
 | `ollama.mounik.ovh`        | 192.168.40.100      | 40   | 443  |
 | `openwebui.mounik.ovh`     | 192.168.40.101      | 40   | 443  |

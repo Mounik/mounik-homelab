@@ -1,0 +1,39 @@
+---
+# Role: jobsync - Installation de JobSync (Tracker candidatures)
+
+- name: Créer le répertoire d'installation
+  file:
+    path: /opt/jobsync
+    state: directory
+    mode: '0755'
+
+- name: Déployer docker-compose.yml
+  template:
+    src: docker-compose.yml.j2
+    dest: /opt/jobsync/docker-compose.yml
+    mode: '0644'
+  notify: restart jobsync
+
+- name: Déployer le fichier .env
+  template:
+    src: env.j2
+    dest: /opt/jobsync/.env
+    mode: '0600'
+  notify: restart jobsync
+
+- name: Démarrer JobSync
+  community.docker.docker_compose:
+    project_src: /opt/jobsync
+    state: present
+  register: jobsync_compose
+
+- name: Attendre que JobSync soit prêt
+  uri:
+    url: "http://localhost:{{ jobsync_port }}/api/health"
+    method: GET
+    status_code: 200
+  register: health_check
+  until: health_check.status == 200
+  retries: 30
+  delay: 10
+  ignore_errors: yes

@@ -1,0 +1,5 @@
+---
+- name: restart twenty-crm
+  community.docker.docker_compose:
+    project_src: /opt/twenty-crm
+    state: restarted

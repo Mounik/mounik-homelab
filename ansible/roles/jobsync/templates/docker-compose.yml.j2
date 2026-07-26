@@ -1,0 +1,21 @@
+services:
+  jobsync:
+    image: ghcr.io/gsync/jobsync:{{ jobsync_version }}
+    container_name: jobsync
+    restart: unless-stopped
+    ports:
+      - "{{ jobsync_port }}:3000"
+    environment:
+      - JWT_SECRET={{ jobsync_jwt_secret }}
+      - DATABASE_URL=file:./data/jobsync.db
+      {% if jobsync_ai_provider %}
+      - AI_PROVIDER={{ jobsync_ai_provider }}
+      - AI_API_KEY={{ jobsync_ai_key }}
+      {% endif %}
+    volumes:
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

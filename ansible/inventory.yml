@@ -70,7 +70,7 @@ all:
         nextcloud:
           ansible_host: 192.168.30.102
           ansible_user: admin
-        mealie:
+        twenty-crm:
           ansible_host: 192.168.30.103
           ansible_user: admin
         actual-budget:
@@ -100,6 +100,9 @@ all:
           ansible_user: admin
         n8n:
           ansible_host: 192.168.40.104
+          ansible_user: admin
+        jobsync:
+          ansible_host: 192.168.40.105
           ansible_user: admin
 
   vars:

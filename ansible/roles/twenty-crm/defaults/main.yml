@@ -1,0 +1,21 @@
+---
+# Role: twenty-crm - Defaults
+
+twenty_version: "v2.1.0"
+twenty_port: "3000"
+twenty_server_port: "3000"
+
+# PostgreSQL
+twenty_pg_password: "CHANGE_ME_PG_PASSWORD"
+twenty_pg_database: "twenty"
+
+# Redis
+twenty_redis_password: "CHANGE_ME_REDIS_PASSWORD"
+
+# Security
+twenty_jwt_secret: "CHANGE_ME_JWT_SECRET"
+twenty_login_secret: "CHANGE_ME_LOGIN_SECRET"
+twenty_file_token_secret: "CHANGE_ME_FILE_TOKEN_SECRET"
+
+# Frontend
+twenty_frontend_url: "https://twenty.mounik.ovh"

@@ -1,0 +1,92 @@
+services:
+  server:
+    image: twentycrm/twenty-server:{{ twenty_version }}
+    container_name: twenty-server
+    restart: unless-stopped
+    ports:
+      - "{{ twenty_server_port }}:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - PG_DATABASE_URL=postgresql://postgres:{{ twenty_pg_password }}@db:5432/{{ twenty_pg_database }}
+      - REDIS_URL=redis://redis:6379
+      - FRONT_BASE_URL={{ twenty_frontend_url }}
+      - JWT_SECRET={{ twenty_jwt_secret }}
+      - LOGIN_SECRET={{ twenty_login_secret }}
+      - FILE_TOKEN_SECRET={{ twenty_file_token_secret }}
+      - ACCESS_TOKEN_SECRET={{ twenty_jwt_secret }}
+      - LOGIN_TOKEN_SECRET={{ twenty_login_secret }}
+      - REFRESH_TOKEN_SECRET={{ twenty_jwt_secret }}
+      - FILE_TOKEN_EXPIRES_IN=1d
+    volumes:
+      - server-data:/app/.local-storage
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  worker:
+    image: twentycrm/twenty-server:{{ twenty_version }}
+    container_name: twenty-worker
+    restart: unless-stopped
+    command: ["yarn", "worker:prod"]
+    environment:
+      - NODE_ENV=production
+      - PG_DATABASE_URL=postgresql://postgres:{{ twenty_pg_password }}@db:5432/{{ twenty_pg_database }}
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET={{ twenty_jwt_secret }}
+      - LOGIN_SECRET={{ twenty_login_secret }}
+      - ACCESS_TOKEN_SECRET={{ twenty_jwt_secret }}
+      - LOGIN_TOKEN_SECRET={{ twenty_login_secret }}
+      - REFRESH_TOKEN_SECRET={{ twenty_jwt_secret }}
+    volumes:
+      - worker-data:/app/.local-storage
+    depends_on:
+      db:
+        condition: service_healthy
+
+  front:
+    image: twentycrm/twenty-front:{{ twenty_version }}
+    container_name: twenty-front
+    restart: unless-stopped
+    ports:
+      - "80:3000"
+    environment:
+      - REACT_APP_API_URL={{ twenty_frontend_url }}/api
+      - REACT_APP_FRONT_BASE_URL={{ twenty_frontend_url }}
+
+  db:
+    image: postgres:16
+    container_name: twenty-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD={{ twenty_pg_password }}
+      - POSTGRES_DB={{ twenty_pg_database }}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7
+    container_name: twenty-redis
+    restart: unless-stopped
+    command: redis-server --requirepass {{ twenty_redis_password }}
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "{{ twenty_redis_password }}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  server-data:
+  worker-data:
+  db-data:
+  redis-data:

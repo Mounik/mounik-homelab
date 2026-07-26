@@ -124,3 +124,23 @@ module "n8n" {
   tags           = "ai;automation"
   description    = "n8n - Automatisation"
 }
+
+# --- VM Career (Docker) ---
+
+module "jobsync" {
+  source = "./modules/vm"
+
+  vm_name        = "jobsync"
+  vm_id          = 315
+  node_name      = var.pve03_node
+  template_name  = var.template_name
+  cpu_cores      = 2
+  memory_mb      = 2048
+  disk_gb        = 20
+  ip_address     = "192.168.40.105"
+  gateway        = var.gateway
+  ssh_public_key = var.ssh_public_key
+  datastore_id   = var.datastore_id
+  tags           = "ai;career;tracker"
+  description    = "JobSync - Tracker candidatures + IA"
+}

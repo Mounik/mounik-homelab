@@ -74,7 +74,24 @@
     ansible_become: no
 
 # =============================================================================
-# ÉTAPE 5: Infrastructure pve01 (Docker)
+# ÉTAPE 5: Applications Docker (pve02 + pve03)
+# =============================================================================
+- name: Déploiement Twenty CRM
+  hosts: twenty-crm
+  become: yes
+  roles:
+    - role: twenty-crm
+      tags: [twenty-crm, career]
+
+- name: Déploiement JobSync
+  hosts: jobsync
+  become: yes
+  roles:
+    - role: jobsync
+      tags: [jobsync, career]
+
+# =============================================================================
+# ÉTAPE 6: Infrastructure pve01 (Docker)
 # =============================================================================
 - name: Configuration Infrastructure (pve01)
   hosts: infrastructure

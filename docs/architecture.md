@@ -34,6 +34,7 @@ Services critiques en Docker Compose :
 | **k3s-node01**   | 200   | 192.168.20.200   | 24 Go | Nœud k3s (server)              |
 | paperless        | 210   | 192.168.30.100   | 4 Go  | Documents administratifs       |
 | immich           | 211   | 192.168.30.101   | 4 Go  | Photos personnelles            |
+| twenty-crm       | 213   | 192.168.30.103   | 4 Go  | Contacts & candidatures        |
 
 #### pve03 — AI + k3s Node 02 (32 Go RAM)
 
@@ -42,6 +43,7 @@ Services critiques en Docker Compose :
 | **k3s-node02**   | 300   | 192.168.20.210   | 24 Go | Nœud k3s (agent)               |
 | ollama           | 310   | 192.168.40.100   | 8 Go  | API IA (modèles cloud)         |
 | open-webui       | 311   | 192.168.40.101   | 4 Go  | Interface IA                   |
+| jobsync          | 315   | 192.168.40.105   | 2 Go  | Tracker candidatures + IA      |
 
 ## Architecture Kubernetes (k3s)
 
