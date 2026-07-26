@@ -106,6 +106,9 @@
     - role: tinyauth
       tags: [tinyauth, auth, infra]
       when: role == 'traefik'
+    - role: monitoring
+      tags: [monitoring, infra]
+      when: role == 'monitoring'
 
 # =============================================================================
 # ÉTAPE 6: Sécurité (toutes les VMs)

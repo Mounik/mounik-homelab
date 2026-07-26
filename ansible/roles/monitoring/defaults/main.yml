@@ -1,0 +1,21 @@
+# Monitoring Stack - Variables
+monitoring_version: "latest"
+
+# Ports
+prometheus_port: 9090
+grafana_port: 3000
+loki_port: 3100
+alertmanager_port: 9093
+node_exporter_port: 9100
+cadvisor_port: 8080
+
+# Grafana
+grafana_admin_password: "{{ vault_grafana_admin_password | default('admin') }}"
+
+# Alertmanager
+alertmanager_smtp_host: "{{ vault_alertmanager_smtp_host | default('') }}"
+alertmanager_smtp_from: "{{ vault_alertmanager_smtp_from | default('alertmanager@mounik.ovh') }}"
+alertmanager_receiver_email: "{{ vault_alertmanager_receiver_email | default('mounik@mounik.ovh') }}"
+
+# Paths
+monitoring_data_dir: /opt/monitoring

@@ -1,0 +1,144 @@
+---
+# Role: monitoring
+# Déploie la stack monitoring complète : Prometheus, Grafana, Loki, Alertmanager
+
+- name: Créer le répertoire de déploiement
+  ansible.builtin.file:
+    path: "{{ monitoring_data_dir }}"
+    state: directory
+    owner: admin
+    group: admin
+    mode: "0755"
+
+- name: Créer les sous-répertoires
+  ansible.builtin.file:
+    path: "{{ monitoring_data_dir }}/{{ item }}"
+    state: directory
+    owner: admin
+    group: admin
+    mode: "0755"
+  loop:
+    - prometheus
+    - grafana/provisioning/datasources
+    - grafana/provisioning/dashboards
+    - grafana/dashboards
+    - loki
+    - promtail
+    - alertmanager
+
+- name: Déployer Docker Compose
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ monitoring_data_dir }}/docker-compose.yml"
+    owner: admin
+    group: admin
+    mode: "0644"
+
+- name: Déployer Prometheus config
+  ansible.builtin.template:
+    src: prometheus/prometheus.yml.j2
+    dest: "{{ monitoring_data_dir }}/prometheus/prometheus.yml"
+    owner: admin
+    group: admin
+    mode: "0644"
+
+- name: Déployer Prometheus alert rules
+  ansible.builtin.template:
+    src: prometheus/alert-rules.yml.j2
+    dest: "{{ monitoring_data_dir }}/prometheus/alert-rules.yml"
+    owner: admin
+    group: admin
+    mode: "0644"
+
+- name: Déployer Loki config
+  ansible.builtin.template:
+    src: loki/loki-config.yml.j2
+    dest: "{{ monitoring_data_dir }}/loki/loki-config.yml"
+    owner: admin
+    group: admin
+    mode: "0644"
+
+- name: Déployer Promtail config
+  ansible.builtin.template:
+    src: promtail/promtail-config.yml.j2
+    dest: "{{ monitoring_data_dir }}/promtail/promtail-config.yml"
+    owner: admin
+    group: admin
+    mode: "0644"
+
+- name: Déployer Alertmanager config
+  ansible.builtin.template:
+    src: alertmanager/alertmanager.yml.j2
+    dest: "{{ monitoring_data_dir }}/alertmanager/alertmanager.yml"
+    owner: admin
+    group: admin
+    mode: "0644"
+
+- name: Déployer Grafana datasources
+  ansible.builtin.template:
+    src: grafana/provisioning/datasources/datasources.yml.j2
+    dest: "{{ monitoring_data_dir }}/grafana/provisioning/datasources/datasources.yml"
+    owner: admin
+    group: admin
+    mode: "0644"
+
+- name: Déployer Grafana dashboard provisioning
+  ansible.builtin.template:
+    src: grafana/provisioning/dashboards/dashboards.yml.j2
+    dest: "{{ monitoring_data_dir }}/grafana/provisioning/dashboards/dashboards.yml"
+    owner: admin
+    group: admin
+    mode: "0644"
+
+- name: Déployer Grafana dashboard system
+  ansible.builtin.template:
+    src: grafana/dashboards/homelab-system.json.j2
+    dest: "{{ monitoring_data_dir }}/grafana/dashboards/homelab-system.json"
+    owner: admin
+    group: admin
+    mode: "0644"
+
+- name: Lancer la stack monitoring
+  community.docker.docker_compose_v2:
+    project_src: "{{ monitoring_data_dir }}"
+    state: present
+  register: monitoring_stack
+
+- name: Attendre que Prometheus soit prêt
+  ansible.builtin.uri:
+    url: "http://localhost:{{ prometheus_port }}/-/healthy"
+    method: GET
+    status_code: 200
+  retries: 10
+  delay: 5
+  register: prometheus_health
+  until: prometheus_health.status == 200
+
+- name: Attendre que Grafana soit prêt
+  ansible.builtin.uri:
+    url: "http://localhost:{{ grafana_port }}/api/health"
+    method: GET
+    status_code: 200
+  retries: 10
+  delay: 5
+  register: grafana_health
+  until: grafana_health.status == 200
+
+- name: Attendre que Loki soit prêt
+  ansible.builtin.uri:
+    url: "http://localhost:{{ loki_port }}/ready"
+    method: GET
+    status_code: 200
+  retries: 10
+  delay: 5
+  register: loki_health
+  until: loki_health.status == 200
+
+- name: Afficher le statut
+  ansible.builtin.debug:
+    msg: |
+      ✅ Stack monitoring déployée !
+      - Prometheus:  http://localhost:{{ prometheus_port }}
+      - Grafana:     http://localhost:{{ grafana_port }}
+      - Loki:        http://localhost:{{ loki_port }}
+      - Alertmanager: http://localhost:{{ alertmanager_port }}
