@@ -2,7 +2,7 @@
 
 Plateforme personnelle auto-hébergée — un environnement cloud domestique pensé comme un vrai datacenter.
 
-## Ce que ce projet démontre
+## Ce que ce projet applique
 
 | Domaine | Compétences |
 |---------|-------------|

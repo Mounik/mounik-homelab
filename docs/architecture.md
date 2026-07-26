@@ -2,7 +2,7 @@
 
 ## Vue d'ensemble
 
-Le Mounik Personal Cloud Platform est un **cluster de 3 ordinateurs** (appelés "nœuds") qui fonctionnent ensemble comme un seul gros serveur. L'objectif est de remplacer les services cloud (Google, iCloud, etc.) par des alternatives auto-hébergées, tout en démontrant des compétences DevOps pour les entretiens.
+Le Mounik Personal Cloud Platform est un **cluster de 3 ordinateurs** (appelés "nœuds") qui fonctionnent ensemble comme un seul gros serveur. L'objectif est de remplacer les services cloud (Google, iCloud, etc.) par des alternatives auto-hébergées, en appliquant les mêmes pratiques que les entreprises DevOps/DevSecOps.
 
 ### L'analogie
 

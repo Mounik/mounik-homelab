@@ -28,7 +28,7 @@ C'est exactement ça : un **cloud personnel** — un petit serveur qui vit chez 
 **Double objectif :**
 
 1. **Usage quotidien** — remplacer les services cloud externes par des alternatives auto-hébergées
-2. **Vitrine professionnelle** — montrer mes compétences DevOps/DevSecOps pour les entretiens d'embauche
+2. **Vitrine professionnelle** — ce projet reflète les pratiques utilisées en entreprise DevOps/DevSecOps
 
 ---
 
